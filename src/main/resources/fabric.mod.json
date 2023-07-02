@@ -17,19 +17,19 @@
 	"entrypoints": {
 		"main": [
 			{
-				"value": "net.requef.flesh.ExampleMod",
+				"value": "net.requef.flesh.Flesh",
 				"adapter": "kotlin"
 			}
 		],
 		"client": [
 			{
-				"value": "net.requef.flesh.ExampleModClient",
+				"value": "net.requef.flesh.FleshClient",
 				"adapter": "kotlin"
 			}
 		],
 		"fabric-datagen": [
 			{
-				"value": "net.requef.flesh.ExampleModDataGenerator",
+				"value": "net.requef.flesh.FleshDataGenerator",
 				"adapter": "kotlin"
 			}
 		]
