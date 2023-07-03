@@ -10,19 +10,16 @@ import net.minecraft.client.render.entity.model.BipedEntityModel
 import net.minecraft.client.render.entity.model.EntityModelLayer
 import net.requef.flesh.Flesh
 import net.requef.flesh.mob.MobRegistry
+import net.requef.flesh.model.OvergrownModel
 
 @Environment(EnvType.CLIENT)
 object Renderers {
-    private val modelOvergrownLayer = EntityModelLayer(Flesh.identifier("overgrown"), "main")
+    val modelOvergrownLayer = EntityModelLayer(Flesh.identifier("overgrown"), "main")
 
     fun register() {
         EntityRendererRegistry.register(MobRegistry.overgrown) { ctx -> OvergrownRenderer(ctx) }
         EntityModelLayerRegistry.registerModelLayer(modelOvergrownLayer) {
-            TexturedModelData.of(
-                BipedEntityModel.getModelData(
-                    Dilation.NONE, 0.0f
-                ), 64, 64
-            )
+            OvergrownModel.getTexturedModelData()
         }
     }
 }
