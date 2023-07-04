@@ -5,7 +5,6 @@ import net.fabricmc.fabric.api.`object`.builder.v1.entity.FabricEntityTypeBuilde
 import net.minecraft.entity.EntityDimensions
 import net.minecraft.entity.EntityType
 import net.minecraft.entity.SpawnGroup
-import net.minecraft.entity.mob.ZombieEntity
 import net.minecraft.registry.Registries
 import net.minecraft.registry.Registry
 import net.requef.flesh.Flesh
@@ -19,6 +18,6 @@ object Mobs {
     )
 
     fun registerAttributes() {
-        FabricDefaultAttributeRegistry.register(overgrown, ZombieEntity.createZombieAttributes())
+        FabricDefaultAttributeRegistry.register(overgrown, Overgrown.createOvergrownAttributes())
     }
 }
