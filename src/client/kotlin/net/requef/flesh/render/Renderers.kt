@@ -2,24 +2,12 @@ package net.requef.flesh.render
 
 import net.fabricmc.api.EnvType
 import net.fabricmc.api.Environment
-import net.fabricmc.fabric.api.client.rendering.v1.EntityModelLayerRegistry
 import net.fabricmc.fabric.api.client.rendering.v1.EntityRendererRegistry
-import net.minecraft.client.model.Dilation
-import net.minecraft.client.model.TexturedModelData
-import net.minecraft.client.render.entity.model.BipedEntityModel
-import net.minecraft.client.render.entity.model.EntityModelLayer
-import net.requef.flesh.Flesh
-import net.requef.flesh.mob.MobRegistry
-import net.requef.flesh.model.OvergrownModel
+import net.requef.flesh.mob.Mobs
 
 @Environment(EnvType.CLIENT)
 object Renderers {
-    val modelOvergrownLayer = EntityModelLayer(Flesh.identifier("overgrown"), "main")
-
     fun register() {
-        EntityRendererRegistry.register(MobRegistry.overgrown) { ctx -> OvergrownRenderer(ctx) }
-        EntityModelLayerRegistry.registerModelLayer(modelOvergrownLayer) {
-            OvergrownModel.getTexturedModelData()
-        }
+        EntityRendererRegistry.register(Mobs.overgrown, ::OvergrownRenderer)
     }
 }
