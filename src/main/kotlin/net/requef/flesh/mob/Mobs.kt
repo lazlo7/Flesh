@@ -10,7 +10,7 @@ import net.minecraft.registry.Registries
 import net.minecraft.registry.Registry
 import net.requef.flesh.Flesh
 
-object MobRegistry {
+object Mobs {
     val overgrown: EntityType<Overgrown> = Registry.register(Registries.ENTITY_TYPE,
         Flesh.identifier("overgrown"),
         FabricEntityTypeBuilder.create(SpawnGroup.MONSTER, ::Overgrown)
