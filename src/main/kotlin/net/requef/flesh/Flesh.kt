@@ -9,9 +9,7 @@ object Flesh : ModInitializer {
     private val logger = LoggerFactory.getLogger("flesh")
 
 	override fun onInitialize() {
-		val mobRegistry = Mobs
-		mobRegistry.registerAttributes()
-
+		Mobs.registerAttributes()
 	}
 
 	fun identifier(path: String) = Identifier("flesh", path)
