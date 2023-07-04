@@ -14,7 +14,7 @@ object Mobs {
     val overgrown: EntityType<Overgrown> = Registry.register(Registries.ENTITY_TYPE,
         Flesh.identifier("overgrown"),
         FabricEntityTypeBuilder.create(SpawnGroup.MONSTER, ::Overgrown)
-            .dimensions(EntityDimensions.fixed(0.5f, 3.0f))
+            .dimensions(EntityDimensions.fixed(0.75f, 2.6f))
             .build()
     )
 
