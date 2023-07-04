@@ -19,6 +19,6 @@ object Mobs {
     )
 
     fun registerAttributes() {
-        FabricDefaultAttributeRegistry.register(overgrown, (ZombieEntity::createZombieAttributes)())
+        FabricDefaultAttributeRegistry.register(overgrown, ZombieEntity.createZombieAttributes())
     }
 }
