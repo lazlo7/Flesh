@@ -30,6 +30,11 @@ class Overgrown(entityType: EntityType<out ZombieEntity>, world: World) : Zombie
     override fun getAnimatableInstanceCache() = cache
 
     private fun <T> predicate(state: AnimationState<T>): PlayState where T: GeoAnimatable {
+        if (state.isMoving) {
+            state.controller.setAnimation(RawAnimation.begin().then("animation.overgrown.walk", Animation.LoopType.LOOP))
+            return PlayState.CONTINUE
+        }
+
         state.controller.setAnimation(RawAnimation.begin()
             .then("animation.overgrown.idle", Animation.LoopType.LOOP))
         return PlayState.CONTINUE
