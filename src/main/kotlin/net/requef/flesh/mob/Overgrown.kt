@@ -31,12 +31,11 @@ class Overgrown(entityType: EntityType<out ZombieEntity>, world: World) : Zombie
 
     private fun <T> predicate(state: AnimationState<T>): PlayState where T: GeoAnimatable {
         if (state.isMoving) {
-            state.controller.setAnimation(RawAnimation.begin().then("animation.overgrown.walk", Animation.LoopType.LOOP))
-            return PlayState.CONTINUE
+            return state.setAndContinue(RawAnimation.begin()
+                .then("animation.overgrown.walk", Animation.LoopType.LOOP))
         }
 
-        state.controller.setAnimation(RawAnimation.begin()
+        return state.setAndContinue(RawAnimation.begin()
             .then("animation.overgrown.idle", Animation.LoopType.LOOP))
-        return PlayState.CONTINUE
     }
 }
