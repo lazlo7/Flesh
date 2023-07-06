@@ -33,7 +33,7 @@ class Archer(entityType: EntityType<out ZombieEntity>, world: World) : ZombieEnt
                 .then("animation.zombie.walk", Animation.LoopType.LOOP))
         }
 
-        // TODO: Add Idle animation
-        return PlayState.STOP
+        return state.setAndContinue(RawAnimation.begin()
+            .then("animation.zombie.idle", Animation.LoopType.LOOP))
     }
 }
