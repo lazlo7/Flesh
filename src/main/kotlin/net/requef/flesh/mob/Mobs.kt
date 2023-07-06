@@ -17,7 +17,14 @@ object Mobs {
             .build()
     )
 
+    val archer: EntityType<Archer> = Registry.register(Registries.ENTITY_TYPE,
+        Flesh.identifier("archer"),
+        FabricEntityTypeBuilder.create(SpawnGroup.MONSTER, ::Archer)
+            .dimensions(EntityDimensions.fixed(0.5f, 2.0f))
+            .build())
+
     fun registerAttributes() {
         FabricDefaultAttributeRegistry.register(overgrown, Overgrown.createOvergrownAttributes())
+        FabricDefaultAttributeRegistry.register(archer, Archer.createArcherAttributes())
     }
 }

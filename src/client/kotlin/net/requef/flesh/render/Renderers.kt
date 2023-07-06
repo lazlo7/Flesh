@@ -9,5 +9,6 @@ import net.requef.flesh.mob.Mobs
 object Renderers {
     fun register() {
         EntityRendererRegistry.register(Mobs.overgrown, ::OvergrownRenderer)
+        EntityRendererRegistry.register(Mobs.archer, ::ArcherRenderer)
     }
 }
