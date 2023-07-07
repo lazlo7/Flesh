@@ -5,7 +5,6 @@ import net.minecraft.entity.attribute.DefaultAttributeContainer
 import net.minecraft.entity.attribute.EntityAttributes
 import net.minecraft.entity.mob.ZombieEntity
 import net.minecraft.world.World
-import net.requef.flesh.Flesh
 import software.bernie.geckolib.animatable.GeoEntity
 import software.bernie.geckolib.core.animatable.GeoAnimatable
 import software.bernie.geckolib.core.animatable.instance.SingletonAnimatableInstanceCache
@@ -43,7 +42,6 @@ class Overgrown(entityType: EntityType<out ZombieEntity>, world: World) : Zombie
 
     private fun <T> attackPredicate(state: AnimationState<T>): PlayState where T: GeoAnimatable {
         if (handSwinging && state.controller.animationState == AnimationController.State.STOPPED) {
-            Flesh.logger.info("Attacking!")
             state.resetCurrentAnimation()
             state.setAnimation(RawAnimation.begin()
                 .then("animation.overgrown.attack", Animation.LoopType.PLAY_ONCE))
