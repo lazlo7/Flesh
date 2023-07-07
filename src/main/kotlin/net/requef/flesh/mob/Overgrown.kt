@@ -26,6 +26,7 @@ class Overgrown(entityType: EntityType<out ZombieEntity>, world: World) : Zombie
 
     override fun registerControllers(registrar: AnimatableManager.ControllerRegistrar) {
         registrar.add(AnimationController(this, "controller", 0, ::predicate))
+        registrar.add(AnimationController(this, "attackController", 0, ::attackPredicate))
     }
 
     override fun getAnimatableInstanceCache() = cache
@@ -36,17 +37,19 @@ class Overgrown(entityType: EntityType<out ZombieEntity>, world: World) : Zombie
                 .then("animation.overgrown.walk", Animation.LoopType.LOOP))
         }
 
-        if (isAttacking) {
-            Flesh.logger.info("Overgrown attacking!")
-            if (state.isCurrentAnimationStage("animation.overgrown.attack")) {
-                return PlayState.CONTINUE
-            }
-            
-            return state.setAndContinue(RawAnimation.begin()
-                .then("animation.overgrown.attack", Animation.LoopType.PLAY_ONCE))
-        }
-
         return state.setAndContinue(RawAnimation.begin()
             .then("animation.overgrown.idle", Animation.LoopType.LOOP))
+    }
+
+    private fun <T> attackPredicate(state: AnimationState<T>): PlayState where T: GeoAnimatable {
+        if (handSwinging && state.controller.animationState == AnimationController.State.STOPPED) {
+            Flesh.logger.info("Attacking!")
+            state.resetCurrentAnimation()
+            state.setAnimation(RawAnimation.begin()
+                .then("animation.overgrown.attack", Animation.LoopType.PLAY_ONCE))
+            handSwinging = false
+        }
+
+        return PlayState.CONTINUE
     }
 }
