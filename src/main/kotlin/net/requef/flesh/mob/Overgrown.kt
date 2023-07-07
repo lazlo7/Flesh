@@ -5,6 +5,7 @@ import net.minecraft.entity.attribute.DefaultAttributeContainer
 import net.minecraft.entity.attribute.EntityAttributes
 import net.minecraft.entity.mob.ZombieEntity
 import net.minecraft.world.World
+import net.requef.flesh.Flesh
 import software.bernie.geckolib.animatable.GeoEntity
 import software.bernie.geckolib.core.animatable.GeoAnimatable
 import software.bernie.geckolib.core.animatable.instance.SingletonAnimatableInstanceCache
@@ -33,6 +34,16 @@ class Overgrown(entityType: EntityType<out ZombieEntity>, world: World) : Zombie
         if (state.isMoving) {
             return state.setAndContinue(RawAnimation.begin()
                 .then("animation.overgrown.walk", Animation.LoopType.LOOP))
+        }
+
+        if (isAttacking) {
+            Flesh.logger.info("Overgrown attacking!")
+            if (state.isCurrentAnimationStage("animation.overgrown.attack")) {
+                return PlayState.CONTINUE
+            }
+            
+            return state.setAndContinue(RawAnimation.begin()
+                .then("animation.overgrown.attack", Animation.LoopType.PLAY_ONCE))
         }
 
         return state.setAndContinue(RawAnimation.begin()
