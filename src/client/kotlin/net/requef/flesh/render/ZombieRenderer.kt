@@ -48,7 +48,7 @@ open class ZombieRenderer<T>(ctx: EntityRendererFactory.Context, model: GeoModel
                 poseStack.multiply(RotationAxis.POSITIVE_X.rotationDegrees(-90.0f))
                 // The held item would appear in the upper part of the arm, closer to the torso.
                 // We translate the position so that the item would appear right around the fist.
-                poseStack.translate(0.1f, 0.1f, -0.8f)
+                poseStack.translate(0.1f, 0.15f, -0.7f)
 
                 super.renderStackForBone(
                     poseStack,
