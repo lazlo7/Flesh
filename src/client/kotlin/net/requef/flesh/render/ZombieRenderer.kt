@@ -1,9 +1,12 @@
 package net.requef.flesh.render
 
+import net.minecraft.client.render.VertexConsumerProvider
 import net.minecraft.client.render.entity.EntityRendererFactory
 import net.minecraft.client.render.model.json.ModelTransformationMode
+import net.minecraft.client.util.math.MatrixStack
 import net.minecraft.entity.mob.MobEntity
 import net.minecraft.item.ItemStack
+import net.minecraft.util.math.RotationAxis
 import software.bernie.geckolib.cache.`object`.GeoBone
 import software.bernie.geckolib.core.animatable.GeoAnimatable
 import software.bernie.geckolib.model.GeoModel
@@ -30,6 +33,33 @@ open class ZombieRenderer<T>(ctx: EntityRendererFactory.Context, model: GeoModel
             ): ModelTransformationMode = when (bone.name) {
                 leftArmBoneName, rightArmBoneName -> ModelTransformationMode.THIRD_PERSON_RIGHT_HAND
                 else -> ModelTransformationMode.NONE
+            }
+
+            override fun renderStackForBone(
+                poseStack: MatrixStack,
+                bone: GeoBone?,
+                stack: ItemStack,
+                animatable: T,
+                bufferSource: VertexConsumerProvider?,
+                partialTick: Float,
+                packedLight: Int,
+                packedOverlay: Int
+            ) {
+                poseStack.multiply(RotationAxis.POSITIVE_X.rotationDegrees(-90.0f))
+                // The held item would appear in the upper part of the arm, closer to the torso.
+                // We translate the position so that the item would appear right around the fist.
+                poseStack.translate(0.1f, 0.1f, -0.8f)
+
+                super.renderStackForBone(
+                    poseStack,
+                    bone,
+                    stack,
+                    animatable,
+                    bufferSource,
+                    partialTick,
+                    packedLight,
+                    packedOverlay
+                )
             }
         })
     }
