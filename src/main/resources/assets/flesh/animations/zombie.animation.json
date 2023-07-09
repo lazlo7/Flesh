@@ -136,7 +136,7 @@
 			}
 		},
 		"animation.zombie.bow_right_hand_attack": {
-			"animation_length": 2.25,
+			"animation_length": 2,
 			"bones": {
 				"right_arm": {
 					"rotation": {
@@ -150,10 +150,6 @@
 						"2.0": {
 							"vector": [-84.95637, -10.61395, 6.59701],
 							"easing": "linear"
-						},
-						"2.25": {
-							"vector": [0, 0, 0],
-							"easing": "easeOutSine"
 						}
 					},
 					"position": {
@@ -166,10 +162,6 @@
 						},
 						"2.0": {
 							"vector": [0, 0, -1]
-						},
-						"2.25": {
-							"vector": [0, 0, 0],
-							"easing": "easeOutSine"
 						}
 					}
 				},
@@ -191,10 +183,6 @@
 						},
 						"2.0": {
 							"vector": [-87.96517, 52.83957, -4.86755]
-						},
-						"2.25": {
-							"vector": [0, 0, 0],
-							"easing": "easeOutSine"
 						}
 					},
 					"position": {
@@ -214,17 +202,13 @@
 						},
 						"2.0": {
 							"vector": [0, 0, 0]
-						},
-						"2.25": {
-							"vector": [0, 0, 0],
-							"easing": "easeOutSine"
 						}
 					}
 				}
 			}
 		},
 		"animation.zombie.bow_left_hand_attack": {
-			"animation_length": 2.25,
+			"animation_length": 2,
 			"bones": {
 				"right_arm": {
 					"rotation": {
@@ -244,10 +228,6 @@
 						},
 						"2.0": {
 							"vector": [-87.96517, -52.8396, 4.8675]
-						},
-						"2.25": {
-							"vector": [0, 0, 0],
-							"easing": "easeOutSine"
 						}
 					},
 					"position": {
@@ -267,10 +247,6 @@
 						},
 						"2.0": {
 							"vector": [0, 0, 0]
-						},
-						"2.25": {
-							"vector": [0, 0, 0],
-							"easing": "easeOutSine"
 						}
 					}
 				},
@@ -286,10 +262,6 @@
 						"2.0": {
 							"vector": [-84.95637, 10.614, -6.597],
 							"easing": "linear"
-						},
-						"2.25": {
-							"vector": [0, 0, 0],
-							"easing": "easeOutSine"
 						}
 					},
 					"position": {
@@ -302,10 +274,6 @@
 						},
 						"2.0": {
 							"vector": [0, 0, -1]
-						},
-						"2.25": {
-							"vector": [0, 0, 0],
-							"easing": "easeOutSine"
 						}
 					}
 				}
