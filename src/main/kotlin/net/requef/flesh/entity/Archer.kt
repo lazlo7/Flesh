@@ -84,11 +84,11 @@ class Archer(entityType: EntityType<out ZombieEntity>, world: World)
     }
 
     override fun attack(target: LivingEntity, pullProgress: Float) {
-        val arrowItem = getProjectileType(getStackInHand(ProjectileUtil.getHandPossiblyHolding(this, Items.BOW)))
-        val arrowEntity = ProjectileUtil.createArrowProjectile(this, arrowItem, pullProgress)
+        val arrow = FireArrow(world, x, eyeY - 0.1, z)
+        arrow.owner = this
 
         val dx = target.x - x
-        val dy = target.getBodyY(0.3333333333333333) - arrowEntity.y
+        val dy = target.getBodyY(0.3333333333333333) - arrow.y
         val dz = target.z - z
 
         val dist = sqrt(dx * dx + dz * dz)
@@ -96,10 +96,10 @@ class Archer(entityType: EntityType<out ZombieEntity>, world: World)
 
         val skeletonDivergence = 14 - world.difficulty.id * 4
 
-        arrowEntity.setVelocity(dx, vy, dz, 2.1f, 0.15f * skeletonDivergence)
+        arrow.setVelocity(dx, vy, dz, 2.1f, 0.15f * skeletonDivergence)
         playSound(SoundEvents.ENTITY_SKELETON_SHOOT, 1.0f, 1.0f / (getRandom().nextFloat() * 0.4f + 0.8f))
 
-        world.spawnEntity(arrowEntity)
+        world.spawnEntity(arrow)
     }
 
     override fun canUseRangedWeapon(weapon: RangedWeaponItem) = weapon is BowItem
