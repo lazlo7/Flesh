@@ -51,6 +51,11 @@
 					]
 				},
 				{
+					"name": "left_arm_held_item",
+					"parent": "left_arm",
+					"pivot": [6, 11, -2]
+				},
+				{
 					"name": "legs",
 					"pivot": [0, 0, 0]
 				},
