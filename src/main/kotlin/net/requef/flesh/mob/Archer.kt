@@ -7,6 +7,7 @@ import net.minecraft.entity.ai.RangedAttackMob
 import net.minecraft.entity.ai.goal.Goal
 import net.minecraft.entity.ai.goal.ZombieAttackGoal
 import net.minecraft.entity.attribute.DefaultAttributeContainer
+import net.minecraft.entity.attribute.EntityAttributes
 import net.minecraft.entity.mob.HostileEntity
 import net.minecraft.entity.mob.MobEntity
 import net.minecraft.entity.mob.ZombieEntity
@@ -26,12 +27,14 @@ import software.bernie.geckolib.core.animatable.instance.SingletonAnimatableInst
 import software.bernie.geckolib.core.animation.*
 import software.bernie.geckolib.core.`object`.PlayState
 import java.util.*
+import kotlin.math.cos
 import kotlin.math.sqrt
 
 class Archer(entityType: EntityType<out ZombieEntity>, world: World)
     : ZombieEntity(entityType, world), GeoEntity, RangedAttackMob {
     companion object {
         fun createArcherAttributes(): DefaultAttributeContainer.Builder = createZombieAttributes()
+            .add(EntityAttributes.GENERIC_ARMOR, 6.0)
     }
 
     private var cache = SingletonAnimatableInstanceCache(this)
@@ -89,9 +92,13 @@ class Archer(entityType: EntityType<out ZombieEntity>, world: World)
         val dx = target.x - x
         val dy = target.getBodyY(0.3333333333333333) - arrowEntity.y
         val dz = target.z - z
-        val dist = sqrt(dx * dx + dz * dz)
 
-        arrowEntity.setVelocity(dx, dy + dist * 0.2, dz, 1.6f, (14 - world.difficulty.id * 4).toFloat())
+        val dist = sqrt(dx * dx + dz * dz)
+        val vy = (dy + dist) * (dy + dist) * 0.005
+
+        val skeletonDivergence = 14 - world.difficulty.id * 4
+
+        arrowEntity.setVelocity(dx, vy, dz, 2.1f, 0.15f * skeletonDivergence)
         playSound(SoundEvents.ENTITY_SKELETON_SHOOT, 1.0f, 1.0f / (getRandom().nextFloat() * 0.4f + 0.8f))
 
         world.spawnEntity(arrowEntity)
