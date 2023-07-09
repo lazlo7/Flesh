@@ -9,8 +9,10 @@ import net.minecraft.entity.ai.goal.ZombieAttackGoal
 import net.minecraft.entity.attribute.DefaultAttributeContainer
 import net.minecraft.entity.mob.ZombieEntity
 import net.minecraft.entity.projectile.ProjectileUtil
+import net.minecraft.item.BowItem
 import net.minecraft.item.ItemStack
 import net.minecraft.item.Items
+import net.minecraft.item.RangedWeaponItem
 import net.minecraft.sound.SoundEvents
 import net.minecraft.util.math.random.Random
 import net.minecraft.world.LocalDifficulty
@@ -32,6 +34,7 @@ class Archer(entityType: EntityType<out ZombieEntity>, world: World)
 
     override fun registerControllers(registrar: AnimatableManager.ControllerRegistrar) {
         registrar.add(AnimationController(this, "controller", 0, ::predicate))
+        registrar.add(AnimationController(this, "bowAttackController", 0, ::attackPredicate))
     }
 
     override fun getAnimatableInstanceCache() = cache
@@ -44,6 +47,22 @@ class Archer(entityType: EntityType<out ZombieEntity>, world: World)
 
         return state.setAndContinue(RawAnimation.begin()
             .then("animation.zombie.idle", Animation.LoopType.LOOP))
+    }
+
+    private fun <T> attackPredicate(state: AnimationState<T>): PlayState where T: GeoAnimatable {
+        if (isAttacking && state.controller.animationState == AnimationController.State.STOPPED) {
+            val path = "animation.zombie.bow_${if (isLeftHanded) "left" else "right"}_hand_attack"
+            state.resetCurrentAnimation()
+            return state.setAndContinue(RawAnimation.begin()
+                .then(path, Animation.LoopType.LOOP))
+        }
+
+        if (!isAttacking) {
+            state.resetCurrentAnimation()
+            return PlayState.STOP
+        }
+
+        return PlayState.CONTINUE
     }
 
     override fun initGoals() {
@@ -72,4 +91,6 @@ class Archer(entityType: EntityType<out ZombieEntity>, world: World)
 
         world.spawnEntity(arrowEntity)
     }
+
+    override fun canUseRangedWeapon(weapon: RangedWeaponItem) = weapon is BowItem
 }

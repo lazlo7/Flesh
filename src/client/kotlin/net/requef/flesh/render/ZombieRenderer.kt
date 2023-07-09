@@ -15,14 +15,14 @@ import software.bernie.geckolib.renderer.layer.BlockAndItemGeoLayer
 
 open class ZombieRenderer<T>(ctx: EntityRendererFactory.Context, model: GeoModel<T>)
     : GeoEntityRenderer<T>(ctx, model) where T: MobEntity, T: GeoAnimatable {
-    val leftArmBoneName = "left_arm"
-    val rightArmBoneName = "right_arm"
+    val rightHeldItemName = "right_arm_held_item"
+    val leftHeldItemName = "left_arm_held_item"
 
     init {
         renderLayers.addLayer(object : BlockAndItemGeoLayer<T>(this) {
             override fun getStackForBone(bone: GeoBone, animatable: T): ItemStack? = when(bone.name) {
-                leftArmBoneName -> if (animatable.isLeftHanded) animatable.mainHandStack else animatable.offHandStack
-                rightArmBoneName -> if (animatable.isLeftHanded) animatable.offHandStack else animatable.mainHandStack
+                leftHeldItemName -> if (animatable.isLeftHanded) animatable.mainHandStack else animatable.offHandStack
+                rightHeldItemName -> if (animatable.isLeftHanded) animatable.offHandStack else animatable.mainHandStack
                 else -> null
             }
 
@@ -31,7 +31,7 @@ open class ZombieRenderer<T>(ctx: EntityRendererFactory.Context, model: GeoModel
                 stack: ItemStack?,
                 animatable: T
             ): ModelTransformationMode = when (bone.name) {
-                leftArmBoneName, rightArmBoneName -> ModelTransformationMode.THIRD_PERSON_RIGHT_HAND
+                leftHeldItemName, rightHeldItemName -> ModelTransformationMode.THIRD_PERSON_RIGHT_HAND
                 else -> ModelTransformationMode.NONE
             }
 
@@ -46,10 +46,6 @@ open class ZombieRenderer<T>(ctx: EntityRendererFactory.Context, model: GeoModel
                 packedOverlay: Int
             ) {
                 poseStack.multiply(RotationAxis.POSITIVE_X.rotationDegrees(-90.0f))
-                // The held item would appear in the upper part of the arm, closer to the torso.
-                // We translate the position so that the item would appear right around the fist.
-                poseStack.translate(0.1f, 0.15f, -0.7f)
-
                 super.renderStackForBone(
                     poseStack,
                     bone,
