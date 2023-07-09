@@ -2,7 +2,7 @@ package net.requef.flesh
 
 import net.fabricmc.api.ModInitializer
 import net.minecraft.util.Identifier
-import net.requef.flesh.mob.Mobs
+import net.requef.flesh.entity.Mobs
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 

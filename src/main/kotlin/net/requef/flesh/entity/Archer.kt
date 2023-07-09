@@ -1,4 +1,4 @@
-package net.requef.flesh.mob
+package net.requef.flesh.entity
 
 import net.minecraft.entity.EntityType
 import net.minecraft.entity.EquipmentSlot
@@ -20,14 +20,12 @@ import net.minecraft.sound.SoundEvents
 import net.minecraft.util.math.random.Random
 import net.minecraft.world.LocalDifficulty
 import net.minecraft.world.World
-import net.requef.flesh.Flesh
 import software.bernie.geckolib.animatable.GeoEntity
 import software.bernie.geckolib.core.animatable.GeoAnimatable
 import software.bernie.geckolib.core.animatable.instance.SingletonAnimatableInstanceCache
 import software.bernie.geckolib.core.animation.*
 import software.bernie.geckolib.core.`object`.PlayState
 import java.util.*
-import kotlin.math.cos
 import kotlin.math.sqrt
 
 class Archer(entityType: EntityType<out ZombieEntity>, world: World)

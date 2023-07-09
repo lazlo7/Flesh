@@ -1,7 +1,7 @@
 package net.requef.flesh.model
 
 import net.requef.flesh.Flesh
-import net.requef.flesh.mob.Overgrown
+import net.requef.flesh.entity.Overgrown
 
 class OvergrownModel : ZombieModel<Overgrown>() {
     override fun getModelResource(animatable: Overgrown) = Flesh.identifier("geo/overgrown.geo.json")

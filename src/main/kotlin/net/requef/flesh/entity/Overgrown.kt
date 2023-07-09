@@ -1,4 +1,4 @@
-package net.requef.flesh.mob
+package net.requef.flesh.entity
 
 import net.minecraft.entity.EntityType
 import net.minecraft.entity.attribute.DefaultAttributeContainer

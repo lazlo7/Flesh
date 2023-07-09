@@ -1,4 +1,4 @@
-package net.requef.flesh.mob
+package net.requef.flesh.entity
 
 import net.fabricmc.fabric.api.`object`.builder.v1.entity.FabricDefaultAttributeRegistry
 import net.fabricmc.fabric.api.`object`.builder.v1.entity.FabricEntityTypeBuilder

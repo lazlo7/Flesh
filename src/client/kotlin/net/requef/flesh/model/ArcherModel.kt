@@ -1,7 +1,7 @@
 package net.requef.flesh.model
 
 import net.requef.flesh.Flesh
-import net.requef.flesh.mob.Archer
+import net.requef.flesh.entity.Archer
 
 class ArcherModel : ZombieModel<Archer>() {
     override fun getModelResource(animatable: Archer) = Flesh.identifier("geo/zombie.geo.json")
