@@ -2,6 +2,7 @@ package net.requef.flesh.entity
 
 import net.minecraft.entity.projectile.ArrowEntity
 import net.minecraft.particle.ParticleTypes
+import net.minecraft.server.world.ServerWorld
 import net.minecraft.world.World
 
 class FireArrow(world: World, x: Double, y: Double, z: Double) : ArrowEntity(world, x, y, z) {
@@ -10,35 +11,39 @@ class FireArrow(world: World, x: Double, y: Double, z: Double) : ArrowEntity(wor
     }
 
     private fun spawnFireParticles() {
-        world.addImportantParticle(
+        val serverWorld = world
+        if (serverWorld !is ServerWorld) {
+            return
+        }
+
+        serverWorld.spawnParticles(
             ParticleTypes.FALLING_DRIPSTONE_LAVA,
-            true,
             x,
             y,
             z,
-            0.0,
-            0.0,
-            0.0
+            1,
+            0.125,
+            0.125,
+            0.125,
+            1.0
         )
-        world.addImportantParticle(
+
+        serverWorld.spawnParticles(
             ParticleTypes.LAVA,
-            true,
             x,
             y,
             z,
-            0.0,
-            0.0,
-            0.0
+            1,
+            0.125,
+            0.125,
+            0.125,
+            1.0
         )
     }
 
     override fun tick() {
         super.tick()
-        if (inGround) {
-            if (inGroundTime % 5 == 0) {
-                spawnFireParticles()
-            }
-        } else {
+        if (fireTicks > 0 && (!inGround || inGroundTime % 5 == 0)) {
             spawnFireParticles()
         }
     }
