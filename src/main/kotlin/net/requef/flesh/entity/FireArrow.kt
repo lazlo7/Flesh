@@ -49,7 +49,7 @@ class FireArrow(world: World, x: Double, y: Double, z: Double) : ArrowEntity(wor
 
     override fun tick() {
         super.tick()
-        if (fireTicks > 0 && (!inGround || inGroundTime % 5 == 0)) {
+        if (fireTicks > 0 && (!inGround || inGroundTime % 10 == 0)) {
             spawnFireParticles()
         }
         if (ticksToSetBlockOnFire > 0 && inGround) {
