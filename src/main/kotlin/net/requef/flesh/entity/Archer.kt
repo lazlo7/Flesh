@@ -20,6 +20,7 @@ import net.minecraft.sound.SoundEvents
 import net.minecraft.util.math.random.Random
 import net.minecraft.world.LocalDifficulty
 import net.minecraft.world.World
+import net.requef.flesh.Flesh
 import software.bernie.geckolib.animatable.GeoEntity
 import software.bernie.geckolib.core.animatable.GeoAnimatable
 import software.bernie.geckolib.core.animatable.instance.SingletonAnimatableInstanceCache
@@ -35,6 +36,7 @@ class Archer(entityType: EntityType<out ZombieEntity>, world: World)
             .add(EntityAttributes.GENERIC_ARMOR, 6.0)
     }
 
+    private val bowRange = 30.0f
     private var cache = SingletonAnimatableInstanceCache(this)
 
     override fun registerControllers(registrar: AnimatableManager.ControllerRegistrar) {
@@ -75,7 +77,7 @@ class Archer(entityType: EntityType<out ZombieEntity>, world: World)
         super.initGoals()
         // Remove melee zombie attack goal because this is a ranged zombie.
         goalSelector.clear { goal -> goal is ZombieAttackGoal }
-        goalSelector.add(2, ArcherBowAttackGoal(this, 1.15, 25, 40, 30.0f))
+        goalSelector.add(2, ArcherBowAttackGoal(this, 1.15, 25, 40, bowRange))
     }
 
     override fun initEquipment(random: Random, localDifficulty: LocalDifficulty) {
@@ -92,11 +94,16 @@ class Archer(entityType: EntityType<out ZombieEntity>, world: World)
         val dz = target.z - z
 
         val dist = sqrt(dx * dx + dz * dz)
-        val vy = (dy + dist) * (dy + dist) * 0.005
+        var vy = dy + dist * 0.17
+        if (dist > bowRange * 0.7) {
+            vy += dist * dist * 0.0045
+        }
+
+        Flesh.logger.info("vy: $vy")
 
         val skeletonDivergence = 14 - world.difficulty.id * 4
 
-        arrow.setVelocity(dx, vy, dz, 2.1f, 0.15f * skeletonDivergence)
+        arrow.setVelocity(dx, vy, dz, 1.7f, 0.15f * skeletonDivergence)
         playSound(SoundEvents.ENTITY_SKELETON_SHOOT, 1.0f, 1.0f / (getRandom().nextFloat() * 0.4f + 0.8f))
 
         world.spawnEntity(arrow)
