@@ -10,20 +10,32 @@ import net.minecraft.registry.Registry
 import net.requef.flesh.Flesh
 
 object Entities {
-    val overgrown: EntityType<Overgrown> = Registry.register(Registries.ENTITY_TYPE,
+    val zombie: EntityType<Zombie> = Registry.register(
+        Registries.ENTITY_TYPE,
+        Flesh.identifier("zombie"),
+        FabricEntityTypeBuilder.create(SpawnGroup.MONSTER, ::Zombie)
+            .dimensions(EntityDimensions.fixed(0.5f, 2.0f))
+            .build()
+    )
+
+    val overgrown: EntityType<Overgrown> = Registry.register(
+        Registries.ENTITY_TYPE,
         Flesh.identifier("overgrown"),
         FabricEntityTypeBuilder.create(SpawnGroup.MONSTER, ::Overgrown)
             .dimensions(EntityDimensions.fixed(0.75f, 2.6f))
             .build()
     )
 
-    val archer: EntityType<Archer> = Registry.register(Registries.ENTITY_TYPE,
+    val archer: EntityType<Archer> = Registry.register(
+        Registries.ENTITY_TYPE,
         Flesh.identifier("archer"),
         FabricEntityTypeBuilder.create(SpawnGroup.MONSTER, ::Archer)
             .dimensions(EntityDimensions.fixed(0.5f, 2.0f))
-            .build())
+            .build()
+    )
 
     fun registerAttributes() {
+        FabricDefaultAttributeRegistry.register(zombie, Zombie.createFleshZombieAttributes())
         FabricDefaultAttributeRegistry.register(overgrown, Overgrown.createOvergrownAttributes())
         FabricDefaultAttributeRegistry.register(archer, Archer.createArcherAttributes())
     }

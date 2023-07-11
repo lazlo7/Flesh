@@ -20,40 +20,24 @@ import net.minecraft.sound.SoundEvents
 import net.minecraft.util.math.random.Random
 import net.minecraft.world.LocalDifficulty
 import net.minecraft.world.World
-import net.requef.flesh.Flesh
-import software.bernie.geckolib.animatable.GeoEntity
 import software.bernie.geckolib.core.animatable.GeoAnimatable
-import software.bernie.geckolib.core.animatable.instance.SingletonAnimatableInstanceCache
 import software.bernie.geckolib.core.animation.*
 import software.bernie.geckolib.core.`object`.PlayState
 import java.util.*
 import kotlin.math.sqrt
 
 class Archer(entityType: EntityType<out ZombieEntity>, world: World)
-    : ZombieEntity(entityType, world), GeoEntity, RangedAttackMob {
+    : Zombie(entityType, world), RangedAttackMob {
     companion object {
-        fun createArcherAttributes(): DefaultAttributeContainer.Builder = createZombieAttributes()
+        fun createArcherAttributes(): DefaultAttributeContainer.Builder = createFleshZombieAttributes()
             .add(EntityAttributes.GENERIC_ARMOR, 6.0)
     }
 
     private val bowRange = 30.0f
-    private var cache = SingletonAnimatableInstanceCache(this)
 
     override fun registerControllers(registrar: AnimatableManager.ControllerRegistrar) {
-        registrar.add(AnimationController(this, "controller", 0, ::predicate))
+        super.registerControllers(registrar)
         registrar.add(AnimationController(this, "bowAttackController", 0, ::attackPredicate))
-    }
-
-    override fun getAnimatableInstanceCache() = cache
-
-    private fun <T> predicate(state: AnimationState<T>): PlayState where T: GeoAnimatable {
-        if (state.isMoving) {
-            return state.setAndContinue(RawAnimation.begin()
-                .then("animation.zombie.walk", Animation.LoopType.LOOP))
-        }
-
-        return state.setAndContinue(RawAnimation.begin()
-            .then("animation.zombie.idle", Animation.LoopType.LOOP))
     }
 
     private fun <T> attackPredicate(state: AnimationState<T>): PlayState where T: GeoAnimatable {

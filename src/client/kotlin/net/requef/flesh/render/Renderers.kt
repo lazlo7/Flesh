@@ -8,6 +8,7 @@ import net.requef.flesh.entity.Entities
 @Environment(EnvType.CLIENT)
 object Renderers {
     fun register() {
+        EntityRendererRegistry.register(Entities.zombie, ::ZombieRenderer)
         EntityRendererRegistry.register(Entities.overgrown, ::OvergrownRenderer)
         EntityRendererRegistry.register(Entities.archer, ::ArcherRenderer)
     }

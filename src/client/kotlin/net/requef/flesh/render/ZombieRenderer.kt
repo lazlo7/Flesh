@@ -7,13 +7,14 @@ import net.minecraft.client.util.math.MatrixStack
 import net.minecraft.entity.mob.MobEntity
 import net.minecraft.item.ItemStack
 import net.minecraft.util.math.RotationAxis
+import net.requef.flesh.model.ZombieModel
 import software.bernie.geckolib.cache.`object`.GeoBone
 import software.bernie.geckolib.core.animatable.GeoAnimatable
 import software.bernie.geckolib.model.GeoModel
 import software.bernie.geckolib.renderer.GeoEntityRenderer
 import software.bernie.geckolib.renderer.layer.BlockAndItemGeoLayer
 
-open class ZombieRenderer<T>(ctx: EntityRendererFactory.Context, model: GeoModel<T>)
+open class ZombieRenderer<T>(ctx: EntityRendererFactory.Context, model: GeoModel<T> = ZombieModel())
     : GeoEntityRenderer<T>(ctx, model) where T: MobEntity, T: GeoAnimatable {
     val rightHeldItemName = "right_arm_held_item"
     val leftHeldItemName = "left_arm_held_item"
