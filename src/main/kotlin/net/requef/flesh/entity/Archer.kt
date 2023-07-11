@@ -95,8 +95,13 @@ class Archer(entityType: EntityType<out ZombieEntity>, world: World)
 
         val dist = sqrt(dx * dx + dz * dz)
         var vy = dy + dist * 0.17
+        // Adjust for long-range horizontal shooting
         if (dist > bowRange * 0.7) {
             vy += dist * dist * 0.0045
+        }
+        // Adjust for long-range upward shooting
+        if (dy >= 8) {
+            vy *= 1.2
         }
 
         Flesh.logger.info("vy: $vy")
