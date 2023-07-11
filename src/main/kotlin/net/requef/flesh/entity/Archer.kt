@@ -90,7 +90,7 @@ class Archer(entityType: EntityType<out ZombieEntity>, world: World)
         arrow.owner = this
 
         val dx = target.x - x
-        val dy = target.getBodyY(0.3333333333333333) - arrow.y
+        val dy = target.getBodyY(1.0 / 3.0) - arrow.y
         val dz = target.z - z
 
         val dist = sqrt(dx * dx + dz * dz)
@@ -103,8 +103,6 @@ class Archer(entityType: EntityType<out ZombieEntity>, world: World)
         if (dy >= 8) {
             vy *= 1.2
         }
-
-        Flesh.logger.info("vy: $vy")
 
         val skeletonDivergence = 14 - world.difficulty.id * 4
 
