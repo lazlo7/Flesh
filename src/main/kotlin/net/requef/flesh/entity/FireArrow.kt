@@ -1,11 +1,17 @@
 package net.requef.flesh.entity
 
+import net.minecraft.block.FireBlock
 import net.minecraft.entity.projectile.ArrowEntity
 import net.minecraft.particle.ParticleTypes
 import net.minecraft.server.world.ServerWorld
+import net.minecraft.util.hit.BlockHitResult
+import net.minecraft.util.math.BlockPos
 import net.minecraft.world.World
 
 class FireArrow(world: World, x: Double, y: Double, z: Double) : ArrowEntity(world, x, y, z) {
+    private var ticksToSetBlockOnFire = 0
+    private var blockPosToSetOnFire: BlockPos? = null
+
     init {
         fireTicks = 20 * 30
     }
@@ -45,6 +51,20 @@ class FireArrow(world: World, x: Double, y: Double, z: Double) : ArrowEntity(wor
         super.tick()
         if (fireTicks > 0 && (!inGround || inGroundTime % 5 == 0)) {
             spawnFireParticles()
+        }
+        if (ticksToSetBlockOnFire > 0 && inGround) {
+            ticksToSetBlockOnFire--
+            if (ticksToSetBlockOnFire == 0) {
+                world.setBlockState(blockPosToSetOnFire, FireBlock.getState(world, blockPosToSetOnFire))
+            }
+        }
+    }
+
+    override fun onBlockHit(blockHitResult: BlockHitResult) {
+        super.onBlockHit(blockHitResult)
+        if (fireTicks > 0) {
+            ticksToSetBlockOnFire = 20 * random.nextBetween(5, 10)
+            blockPosToSetOnFire = blockHitResult.blockPos.add(blockHitResult.side.vector)
         }
     }
 }
