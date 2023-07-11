@@ -19,6 +19,9 @@ class Overgrown(entityType: EntityType<out ZombieEntity>, world: World) : Zombie
             .add(EntityAttributes.GENERIC_ATTACK_KNOCKBACK, 3.0)
     }
 
+    override val attackAnimationName: String
+        get() = "animation.overgrown.attack"
+
     override fun registerControllers(registrar: AnimatableManager.ControllerRegistrar) {
         super.registerControllers(registrar)
         registrar.add(AnimationController(this, "attackController", 0, ::attackPredicate))
@@ -32,16 +35,5 @@ class Overgrown(entityType: EntityType<out ZombieEntity>, world: World) : Zombie
 
         return state.setAndContinue(RawAnimation.begin()
             .then("animation.overgrown.idle", Animation.LoopType.LOOP))
-    }
-
-    private fun <T> attackPredicate(state: AnimationState<T>): PlayState where T: GeoAnimatable {
-        if (handSwinging && state.controller.animationState == AnimationController.State.STOPPED) {
-            state.resetCurrentAnimation()
-            state.setAnimation(RawAnimation.begin()
-                .then("animation.overgrown.attack", Animation.LoopType.PLAY_ONCE))
-            handSwinging = false
-        }
-
-        return PlayState.CONTINUE
     }
 }

@@ -40,7 +40,7 @@ class Archer(entityType: EntityType<out ZombieEntity>, world: World)
         registrar.add(AnimationController(this, "bowAttackController", 0, ::attackPredicate))
     }
 
-    private fun <T> attackPredicate(state: AnimationState<T>): PlayState where T: GeoAnimatable {
+    override fun <T> attackPredicate(state: AnimationState<T>): PlayState where T: GeoAnimatable {
         if (isUsingItem && state.controller.animationState == AnimationController.State.STOPPED) {
             val path = "animation.zombie.bow_${if (isLeftHanded) "left" else "right"}_hand_attack"
             state.resetCurrentAnimation()
