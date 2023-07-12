@@ -4,35 +4,35 @@ import net.fabricmc.fabric.api.`object`.builder.v1.entity.FabricDefaultAttribute
 import net.fabricmc.fabric.api.`object`.builder.v1.entity.FabricEntityTypeBuilder
 import net.minecraft.entity.EntityDimensions
 import net.minecraft.entity.EntityType
+import net.minecraft.entity.EntityType.EntityFactory
 import net.minecraft.entity.SpawnGroup
+import net.minecraft.entity.mob.MobEntity
 import net.minecraft.registry.Registries
 import net.minecraft.registry.Registry
 import net.requef.flesh.Flesh
 
 object Entities {
-    val zombie: EntityType<Zombie> = Registry.register(
-        Registries.ENTITY_TYPE,
-        Flesh.identifier("zombie"),
-        FabricEntityTypeBuilder.create(SpawnGroup.MONSTER, ::Zombie)
-            .dimensions(EntityDimensions.fixed(0.5f, 2.0f))
-            .build()
+    private fun <T : MobEntity> register(
+        id: String,
+        entity: EntityFactory<T>,
+        builder: (FabricEntityTypeBuilder<T>) -> FabricEntityTypeBuilder<T> = { b -> b }
+    ) = Registry.register(
+            Registries.ENTITY_TYPE,
+            Flesh.identifier(id),
+            builder(FabricEntityTypeBuilder.Mob.create(SpawnGroup.MONSTER, entity)
+                .spawnableFarFromPlayer()
+                .trackRangeChunks(8)
+                .dimensions(EntityDimensions.fixed(0.5f, 2.0f))
+            ).build()
     )
 
-    val overgrown: EntityType<Overgrown> = Registry.register(
-        Registries.ENTITY_TYPE,
-        Flesh.identifier("overgrown"),
-        FabricEntityTypeBuilder.create(SpawnGroup.MONSTER, ::Overgrown)
-            .dimensions(EntityDimensions.fixed(0.75f, 2.6f))
-            .build()
-    )
+    val zombie: EntityType<Zombie> = register("zombie", ::Zombie)
 
-    val archer: EntityType<Archer> = Registry.register(
-        Registries.ENTITY_TYPE,
-        Flesh.identifier("archer"),
-        FabricEntityTypeBuilder.create(SpawnGroup.MONSTER, ::Archer)
-            .dimensions(EntityDimensions.fixed(0.5f, 2.0f))
-            .build()
-    )
+    val overgrown: EntityType<Overgrown> = register("overgrown", ::Overgrown) {
+        builder -> builder.dimensions(EntityDimensions.fixed(0.75f, 2.6f))
+    }
+
+    val archer: EntityType<Archer> = register("archer", ::Archer)
 
     fun registerAttributes() {
         FabricDefaultAttributeRegistry.register(zombie, Zombie.createFleshZombieAttributes())
