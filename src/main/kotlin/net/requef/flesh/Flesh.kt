@@ -11,6 +11,10 @@ object Flesh : ModInitializer {
 
 	override fun onInitialize() {
 		Entities.registerAttributes()
+
+		EntitySpawns.removeVanillaZombieSpawns()
+		EntitySpawns.reduceVanillaMonstersSpawns(0.15f)
+		EntitySpawns.registerEntitySpawns()
 	}
 
 	fun identifier(path: String) = Identifier("flesh", path)
