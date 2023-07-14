@@ -27,43 +27,44 @@ class Bloody(val type: Type, entityType: EntityType<out ZombieEntity>, world: Wo
                 EntityAttributeModifier(
                     type.attributeBonusName,
                     multiplier,
-                    EntityAttributeModifier.Operation.MULTIPLY_BASE
+                    EntityAttributeModifier.Operation.ADDITION
                 )
             )
         }
 
-        apply(EntityAttributes.GENERIC_MAX_HEALTH, type.healthMultiplier)
-        apply(EntityAttributes.GENERIC_MOVEMENT_SPEED, type.speedMultiplier)
-        apply(EntityAttributes.GENERIC_ATTACK_DAMAGE, type.attackDamageMultiplier)
+        apply(EntityAttributes.GENERIC_MAX_HEALTH, type.healthIncrease)
+        health = getAttributeValue(EntityAttributes.GENERIC_MAX_HEALTH).toFloat()
+        apply(EntityAttributes.GENERIC_MOVEMENT_SPEED, type.speedIncrease)
+        apply(EntityAttributes.GENERIC_ATTACK_DAMAGE, type.attackDamageIncrease)
     }
 
     enum class Type(
         val textureName: String,
         val attributeBonusName: String,
-        val healthMultiplier: Double,
-        val speedMultiplier: Double,
-        val attackDamageMultiplier: Double
+        val healthIncrease: Double,
+        val speedIncrease: Double,
+        val attackDamageIncrease: Double
     ) {
         SOMEWHAT_MUTILATED(
             "variant1.png",
             "Bloodlust I",
-            1.25,
-            1.087,
-            1.333
+            5.0,
+            0.02,
+            1.0
         ),
         MUTILATED(
             "variant2.png",
             "Bloodlust II",
-            1.6,
-            1.25,
-            1.6
+            12.0,
+            0.0575,
+            1.8
         ),
         EXTREMELY_MUTILATED(
             "variant3.png",
             "Bloodlust III",
-            2.0,
-            1.5,
-            2.05
+            20.0,
+            0.115,
+            3.05
         )
     }
 }
