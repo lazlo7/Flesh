@@ -2,17 +2,17 @@ package net.requef.flesh.entity
 
 import net.fabricmc.fabric.api.`object`.builder.v1.entity.FabricDefaultAttributeRegistry
 import net.fabricmc.fabric.api.`object`.builder.v1.entity.FabricEntityTypeBuilder
+import net.minecraft.entity.Entity
 import net.minecraft.entity.EntityDimensions
 import net.minecraft.entity.EntityType
 import net.minecraft.entity.EntityType.EntityFactory
 import net.minecraft.entity.SpawnGroup
-import net.minecraft.entity.mob.MobEntity
 import net.minecraft.registry.Registries
 import net.minecraft.registry.Registry
 import net.requef.flesh.Flesh
 
 object Entities {
-    private fun <T : MobEntity> register(
+    private fun <T : Entity> register(
         id: String,
         entity: EntityFactory<T>,
         builder: (FabricEntityTypeBuilder<T>) -> FabricEntityTypeBuilder<T> = { b -> b }
@@ -34,9 +34,12 @@ object Entities {
 
     val archer: EntityType<Archer> = register("archer", ::Archer)
 
+    val bloody: EntityType<Bloody> = register("bloody", Bloody::createBloodyZombie)
+
     fun registerAttributes() {
         FabricDefaultAttributeRegistry.register(zombie, Zombie.createFleshZombieAttributes())
         FabricDefaultAttributeRegistry.register(overgrown, Overgrown.createOvergrownAttributes())
         FabricDefaultAttributeRegistry.register(archer, Archer.createArcherAttributes())
+        FabricDefaultAttributeRegistry.register(bloody, Bloody.createBloodyAttributes())
     }
 }
