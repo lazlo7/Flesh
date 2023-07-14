@@ -25,6 +25,9 @@ object EntitySpawns {
         addOverworld(Entities.archer, 40, 1, 4)
         SpawnRestriction.register(Entities.archer, SpawnRestriction.Location.ON_GROUND, Heightmap.Type.MOTION_BLOCKING_NO_LEAVES, HostileEntity::canSpawnInDark)
 
+        addOverworld(Entities.bloody, 30, 1, 4)
+        SpawnRestriction.register(Entities.bloody, SpawnRestriction.Location.ON_GROUND, Heightmap.Type.MOTION_BLOCKING_NO_LEAVES, HostileEntity::canSpawnInDark)
+
         addOverworld(Entities.overgrown, 25, 1, 4)
         SpawnRestriction.register(Entities.overgrown, SpawnRestriction.Location.ON_GROUND, Heightmap.Type.MOTION_BLOCKING_NO_LEAVES, HostileEntity::canSpawnInDark)
     }
