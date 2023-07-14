@@ -10,9 +10,9 @@ import net.minecraft.world.World
 class Bloody(val type: Type, entityType: EntityType<out ZombieEntity>, world: World) : Zombie(entityType, world) {
     companion object {
         fun createBloodyZombie(entityType: EntityType<out ZombieEntity>, world: World) = when (world.random.nextFloat()) {
-            in 0.6f..1.0f -> Bloody(Type.SOMEWHAT_MUTILATED, entityType, world)
-            in 0.25f..0.6f -> Bloody(Type.MUTILATED, entityType, world)
-            in 0.0f..0.25f -> Bloody(Type.EXTREMELY_MUTILATED, entityType, world)
+            in 0.5f..1.0f -> Bloody(Type.SOMEWHAT_MUTILATED, entityType, world)
+            in 0.15f..0.5f -> Bloody(Type.MUTILATED, entityType, world)
+            in 0.0f..0.15f -> Bloody(Type.EXTREMELY_MUTILATED, entityType, world)
             else -> throw AssertionError("Unreachable.")
         }
 
