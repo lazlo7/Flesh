@@ -52,4 +52,10 @@ open class Zombie(entityType: EntityType<out ZombieEntity>, world: World) : Zomb
     }
 
     override fun getAnimatableInstanceCache() = cache
+
+    override fun isBaby() = false
+
+    override fun setBaby(baby: Boolean) {
+
+    }
 }
