@@ -60,7 +60,7 @@ open class Zombie(entityType: EntityType<out ZombieEntity>, world: World) : Zomb
 
     override fun initialize(
         world: ServerWorldAccess?,
-        difficulty: LocalDifficulty?,
+        difficulty: LocalDifficulty,
         spawnReason: SpawnReason?,
         entityData: EntityData?,
         entityNbt: NbtCompound?
@@ -69,6 +69,11 @@ open class Zombie(entityType: EntityType<out ZombieEntity>, world: World) : Zomb
         // It only does it if the provided entity data is an instance of ZombieData.
         // Flesh zombies can't be babies - by providing a plain entity data object,
         // the super-method skips the attempt to make the entity a baby.
-        return super.initialize(world, difficulty, spawnReason, object : EntityData {}, entityNbt)
+        super.initialize(world, difficulty, spawnReason, object : EntityData {}, entityNbt)
+
+        // However, we still need to call other methods that go after the baby-setting code.
+        setCanBreakDoors(shouldBreakDoors() && random.nextFloat() < difficulty.clampedLocalDifficulty * 0.1f)
+        initEquipment(random, difficulty)
+        updateEnchantments(random, difficulty)
     }
 }
