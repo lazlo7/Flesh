@@ -47,7 +47,8 @@
 		"java": ">=17",
 		"fabric-api": "*",
 		"fabric-language-kotlin": ">=1.8.22",
-		"geckolib": ">=4.2"
+		"geckolib": ">=4.2",
+		"smartbrainlib": ">=1.11.1"
 	},
 	"suggests": {
 		"another-mod": "*"
