@@ -6,13 +6,34 @@ import net.minecraft.entity.SpawnReason
 import net.minecraft.entity.ai.brain.Brain
 import net.minecraft.entity.attribute.DefaultAttributeContainer
 import net.minecraft.entity.mob.ZombieEntity
+import net.minecraft.entity.passive.IronGolemEntity
+import net.minecraft.entity.passive.SnowGolemEntity
+import net.minecraft.entity.player.PlayerEntity
 import net.minecraft.nbt.NbtCompound
 import net.minecraft.world.LocalDifficulty
 import net.minecraft.world.ServerWorldAccess
 import net.minecraft.world.World
 import net.tslat.smartbrainlib.api.SmartBrainOwner
+import net.tslat.smartbrainlib.api.core.BrainActivityGroup
 import net.tslat.smartbrainlib.api.core.SmartBrainProvider
+import net.tslat.smartbrainlib.api.core.behaviour.FirstApplicableBehaviour
+import net.tslat.smartbrainlib.api.core.behaviour.OneRandomBehaviour
+import net.tslat.smartbrainlib.api.core.behaviour.custom.attack.AnimatableMeleeAttack
+import net.tslat.smartbrainlib.api.core.behaviour.custom.look.LookAtTarget
+import net.tslat.smartbrainlib.api.core.behaviour.custom.misc.AvoidSun
+import net.tslat.smartbrainlib.api.core.behaviour.custom.misc.Idle
+import net.tslat.smartbrainlib.api.core.behaviour.custom.move.EscapeSun
+import net.tslat.smartbrainlib.api.core.behaviour.custom.move.MoveToWalkTarget
+import net.tslat.smartbrainlib.api.core.behaviour.custom.path.SetRandomWalkTarget
+import net.tslat.smartbrainlib.api.core.behaviour.custom.path.SetWalkTargetToAttackTarget
+import net.tslat.smartbrainlib.api.core.behaviour.custom.target.InvalidateAttackTarget
+import net.tslat.smartbrainlib.api.core.behaviour.custom.target.SetPlayerLookTarget
+import net.tslat.smartbrainlib.api.core.behaviour.custom.target.SetRandomLookTarget
+import net.tslat.smartbrainlib.api.core.behaviour.custom.target.TargetOrRetaliate
 import net.tslat.smartbrainlib.api.core.sensor.ExtendedSensor
+import net.tslat.smartbrainlib.api.core.sensor.vanilla.HurtBySensor
+import net.tslat.smartbrainlib.api.core.sensor.vanilla.NearbyLivingEntitySensor
+import net.tslat.smartbrainlib.api.core.sensor.vanilla.NearbyPlayersSensor
 import software.bernie.geckolib.animatable.GeoEntity
 import software.bernie.geckolib.core.animatable.GeoAnimatable
 import software.bernie.geckolib.core.animatable.instance.SingletonAnimatableInstanceCache
@@ -98,5 +119,36 @@ open class Zombie(entityType: EntityType<out ZombieEntity>, world: World)
         tickBrain(this)
     }
 
-    override fun getSensors() = ArrayList<ExtendedSensor<Zombie>>()
+    override fun getSensors() = listOf<ExtendedSensor<Zombie>>(
+        NearbyPlayersSensor(),
+        NearbyLivingEntitySensor<Zombie>()
+            .setPredicate { target, _ -> target is PlayerEntity
+                    || target is IronGolemEntity
+                    || target is SnowGolemEntity},
+        HurtBySensor<Zombie>().setPredicate { _, entity -> entity !is Zombie }
+    )
+
+    override fun getCoreTasks(): BrainActivityGroup<out Zombie> = BrainActivityGroup.coreTasks(
+        AvoidSun<Zombie>(),
+        EscapeSun<Zombie>(),
+        LookAtTarget<Zombie>(),
+        MoveToWalkTarget<Zombie>()
+    )
+
+    override fun getIdleTasks(): BrainActivityGroup<out Zombie> = BrainActivityGroup.idleTasks(
+        FirstApplicableBehaviour(
+            TargetOrRetaliate<Zombie>().alertAlliesWhen { _, _ -> true },
+            SetPlayerLookTarget(),
+            SetRandomLookTarget()),
+        OneRandomBehaviour(
+            SetRandomWalkTarget<Zombie>().setRadius(20.0),
+            Idle<Zombie>().runFor { entity -> entity.random.nextBetween(30, 60) }
+        )
+    )
+
+    override fun getFightTasks(): BrainActivityGroup<out Zombie> = BrainActivityGroup.fightTasks(
+        InvalidateAttackTarget<Zombie>(),
+        SetWalkTargetToAttackTarget<Zombie>(),
+        AnimatableMeleeAttack<Zombie>(0)
+    )
 }
