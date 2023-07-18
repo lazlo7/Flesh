@@ -3,23 +3,24 @@ package net.requef.flesh.entity
 import net.minecraft.entity.EntityData
 import net.minecraft.entity.EntityType
 import net.minecraft.entity.SpawnReason
-import net.minecraft.entity.ai.goal.*
+import net.minecraft.entity.ai.brain.Brain
 import net.minecraft.entity.attribute.DefaultAttributeContainer
 import net.minecraft.entity.mob.ZombieEntity
-import net.minecraft.entity.mob.ZombifiedPiglinEntity
-import net.minecraft.entity.passive.IronGolemEntity
-import net.minecraft.entity.player.PlayerEntity
 import net.minecraft.nbt.NbtCompound
 import net.minecraft.world.LocalDifficulty
 import net.minecraft.world.ServerWorldAccess
 import net.minecraft.world.World
+import net.tslat.smartbrainlib.api.SmartBrainOwner
+import net.tslat.smartbrainlib.api.core.SmartBrainProvider
+import net.tslat.smartbrainlib.api.core.sensor.ExtendedSensor
 import software.bernie.geckolib.animatable.GeoEntity
 import software.bernie.geckolib.core.animatable.GeoAnimatable
 import software.bernie.geckolib.core.animatable.instance.SingletonAnimatableInstanceCache
 import software.bernie.geckolib.core.animation.*
 import software.bernie.geckolib.core.`object`.PlayState
 
-open class Zombie(entityType: EntityType<out ZombieEntity>, world: World) : ZombieEntity(entityType, world), GeoEntity {
+open class Zombie(entityType: EntityType<out ZombieEntity>, world: World)
+    : ZombieEntity(entityType, world), GeoEntity, SmartBrainOwner<Zombie> {
     companion object {
         fun createFleshZombieAttributes(): DefaultAttributeContainer.Builder = createZombieAttributes()
     }
@@ -62,17 +63,8 @@ open class Zombie(entityType: EntityType<out ZombieEntity>, world: World) : Zomb
 
     override fun getAnimatableInstanceCache() = cache
 
-    override fun initGoals() {
-        targetSelector.add(1, RevengeGoal(this, javaClass).setGroupRevenge(ZombifiedPiglinEntity::class.java))
-        targetSelector.add(2, ActiveTargetGoal(this, PlayerEntity::class.java, true))
-        targetSelector.add(3, ActiveTargetGoal(this, IronGolemEntity::class.java, true))
-
-        goalSelector.add(2, ZombieAttackGoal(this, 1.0, false))
-        goalSelector.add(6, MoveThroughVillageGoal(this, 1.0, true, 4) { canBreakDoors() })
-        goalSelector.add(7, WanderAroundFarGoal(this, 1.0))
-        goalSelector.add(8, LookAtEntityGoal(this, PlayerEntity::class.java, 8.0f))
-        goalSelector.add(8, LookAroundGoal(this))
-    }
+    // Clear any goals - use SmartBrainLib's system instead.
+    override fun initGoals() { }
 
     override fun initialize(
         world: ServerWorldAccess?,
@@ -94,4 +86,17 @@ open class Zombie(entityType: EntityType<out ZombieEntity>, world: World) : Zomb
 
         return result
     }
+
+    @Suppress("KotlinConstantConditions")
+    // Since Brain.Profile is a final class, kotlin will issue a warning about an always-fail cast.
+    // However, the cast will proceed as normal because of an SBL's access widener,
+    // which will make Brain.Profile extensible during run-time.
+    override fun createBrainProfile() = SmartBrainProvider(this) as Brain.Profile<*>
+
+    override fun mobTick() {
+        super.mobTick()
+        tickBrain(this)
+    }
+
+    override fun getSensors() = ArrayList<ExtendedSensor<Zombie>>()
 }
