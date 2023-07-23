@@ -137,7 +137,9 @@ open class Zombie(entityType: EntityType<out ZombieEntity>, world: World)
 
     override fun getIdleTasks(): BrainActivityGroup<out Zombie> = BrainActivityGroup.idleTasks(
         FirstApplicableBehaviour(
-            TargetOrRetaliate<Zombie>().alertAlliesWhen { _, _ -> true },
+            TargetOrRetaliate<Zombie>()
+                .attackablePredicate { entity -> entity !is Zombie }
+                .alertAlliesWhen { _, _ -> true },
             SetPlayerLookTarget(),
             SetRandomLookTarget()),
         OneRandomBehaviour(
