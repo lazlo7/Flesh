@@ -140,8 +140,11 @@ open class Zombie(entityType: EntityType<out ZombieEntity>, world: World)
             TargetOrRetaliate<Zombie>()
                 .attackablePredicate { entity -> entity !is Zombie }
                 .alertAlliesWhen { _, _ -> true },
-            SetPlayerLookTarget(),
-            SetRandomLookTarget()),
+            OneRandomBehaviour(
+                SetPlayerLookTarget(),
+                SetRandomLookTarget()
+            )
+        ),
         OneRandomBehaviour(
             SetRandomWalkTarget<Zombie>().setRadius(20.0),
             Idle<Zombie>().runFor { entity -> entity.random.nextBetween(30, 60) }
