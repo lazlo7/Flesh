@@ -110,7 +110,7 @@ open class Zombie(entityType: EntityType<out ZombieEntity>, world: World)
 
     @Suppress("KotlinConstantConditions")
     // Since Brain.Profile is a final class, kotlin will issue a warning about an always-fail cast.
-    // However, the cast will proceed as normal because of an SBL's access widener,
+    // However, the cast will proceed as normal because of an SmartBrainLib's access widener,
     // which will make Brain.Profile extensible during run-time.
     override fun createBrainProfile() = SmartBrainProvider(this) as Brain.Profile<*>
 
