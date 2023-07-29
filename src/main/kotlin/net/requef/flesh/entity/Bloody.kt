@@ -12,12 +12,19 @@ import net.minecraft.entity.attribute.EntityAttributes
 import net.minecraft.entity.mob.MobEntity
 import net.minecraft.entity.mob.ZombieEntity
 import net.minecraft.server.world.ServerWorld
+import net.minecraft.util.math.floatprovider.ConstantFloatProvider
 import net.minecraft.world.World
 import net.tslat.smartbrainlib.api.core.BrainActivityGroup
 import net.tslat.smartbrainlib.api.core.behaviour.ExtendedBehaviour
+import net.tslat.smartbrainlib.api.core.behaviour.FirstApplicableBehaviour
+import net.tslat.smartbrainlib.api.core.behaviour.OneRandomBehaviour
 import net.tslat.smartbrainlib.api.core.behaviour.custom.attack.AnimatableMeleeAttack
+import net.tslat.smartbrainlib.api.core.behaviour.custom.misc.Idle
+import net.tslat.smartbrainlib.api.core.behaviour.custom.path.SetRandomWalkTarget
 import net.tslat.smartbrainlib.api.core.behaviour.custom.path.SetWalkTargetToAttackTarget
 import net.tslat.smartbrainlib.api.core.behaviour.custom.target.InvalidateAttackTarget
+import net.tslat.smartbrainlib.api.core.behaviour.custom.target.SetRandomLookTarget
+import net.tslat.smartbrainlib.api.core.behaviour.custom.target.TargetOrRetaliate
 import net.tslat.smartbrainlib.util.BrainUtils
 import java.util.function.BiPredicate
 import kotlin.math.pow
@@ -61,6 +68,24 @@ class Bloody(val type: Type, entityType: EntityType<out ZombieEntity>, world: Wo
             lookControl.lookAt(target)
         }
     }
+
+    override fun getIdleTasks(): BrainActivityGroup<out Zombie> = BrainActivityGroup.idleTasks(
+        FirstApplicableBehaviour(
+            TargetOrRetaliate<Bloody>()
+                .attackablePredicate { entity -> entity !is Zombie }
+                .alertAlliesWhen { _, _ -> true },
+            SetRandomLookTarget<Bloody>()
+                .lookChance(ConstantFloatProvider.create(0.2f))
+                .lookTime { entity -> entity.random.nextInt(10) + 10 }
+        ),
+        OneRandomBehaviour(
+            SetRandomWalkTarget<Bloody>().setRadius(1.0).speedModifier(1.25f),
+            OneRandomBehaviour(
+                SetRandomWalkTarget<Bloody>().setRadius(15.0),
+                Idle<Bloody>().runFor { entity -> entity.random.nextBetween(20, 50) }
+            )
+        )
+    )
 
     override fun getFightTasks(): BrainActivityGroup<out Zombie> = BrainActivityGroup.fightTasks(
         InvalidateAttackTarget<Bloody>(),
@@ -135,8 +160,8 @@ class Bloody(val type: Type, entityType: EntityType<out ZombieEntity>, world: Wo
 
             val targetPos = attackTarget.pos
             val vel = targetPos.subtract(entity.pos)
-                .normalize()
                 .add(0.0, lungeYSpeed, 0.0)
+                .normalize()
             entity.addVelocity(vel)
         }
     }
