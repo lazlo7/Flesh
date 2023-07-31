@@ -14,10 +14,12 @@ import net.minecraft.entity.mob.ZombieEntity
 import net.minecraft.server.world.ServerWorld
 import net.minecraft.util.math.floatprovider.ConstantFloatProvider
 import net.minecraft.world.World
+import net.requef.flesh.ai.AlertAboutAttackTarget
 import net.tslat.smartbrainlib.api.core.BrainActivityGroup
 import net.tslat.smartbrainlib.api.core.behaviour.ExtendedBehaviour
 import net.tslat.smartbrainlib.api.core.behaviour.FirstApplicableBehaviour
 import net.tslat.smartbrainlib.api.core.behaviour.OneRandomBehaviour
+import net.tslat.smartbrainlib.api.core.behaviour.SequentialBehaviour
 import net.tslat.smartbrainlib.api.core.behaviour.custom.attack.AnimatableMeleeAttack
 import net.tslat.smartbrainlib.api.core.behaviour.custom.misc.Idle
 import net.tslat.smartbrainlib.api.core.behaviour.custom.path.SetRandomWalkTarget
@@ -71,9 +73,11 @@ class Bloody(val type: Type, entityType: EntityType<out ZombieEntity>, world: Wo
 
     override fun getIdleTasks(): BrainActivityGroup<out Zombie> = BrainActivityGroup.idleTasks(
         FirstApplicableBehaviour(
-            TargetOrRetaliate<Bloody>()
-                .attackablePredicate { entity -> entity !is Zombie }
-                .alertAlliesWhen { _, _ -> true },
+            SequentialBehaviour(
+                TargetOrRetaliate<Zombie>()
+                    .attackablePredicate { entity -> entity !is Zombie },
+                AlertAboutAttackTarget()
+            ),
             SetRandomLookTarget<Bloody>()
                 .lookChance(ConstantFloatProvider.create(0.2f))
                 .lookTime { entity -> entity.random.nextInt(10) + 10 }

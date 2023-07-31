@@ -13,11 +13,13 @@ import net.minecraft.nbt.NbtCompound
 import net.minecraft.world.LocalDifficulty
 import net.minecraft.world.ServerWorldAccess
 import net.minecraft.world.World
+import net.requef.flesh.ai.AlertAboutAttackTarget
 import net.tslat.smartbrainlib.api.SmartBrainOwner
 import net.tslat.smartbrainlib.api.core.BrainActivityGroup
 import net.tslat.smartbrainlib.api.core.SmartBrainProvider
 import net.tslat.smartbrainlib.api.core.behaviour.FirstApplicableBehaviour
 import net.tslat.smartbrainlib.api.core.behaviour.OneRandomBehaviour
+import net.tslat.smartbrainlib.api.core.behaviour.SequentialBehaviour
 import net.tslat.smartbrainlib.api.core.behaviour.custom.attack.AnimatableMeleeAttack
 import net.tslat.smartbrainlib.api.core.behaviour.custom.look.LookAtTarget
 import net.tslat.smartbrainlib.api.core.behaviour.custom.misc.AvoidSun
@@ -137,9 +139,11 @@ open class Zombie(entityType: EntityType<out ZombieEntity>, world: World)
 
     override fun getIdleTasks(): BrainActivityGroup<out Zombie> = BrainActivityGroup.idleTasks(
         FirstApplicableBehaviour(
-            TargetOrRetaliate<Zombie>()
-                .attackablePredicate { entity -> entity !is Zombie }
-                .alertAlliesWhen { _, _ -> true },
+            SequentialBehaviour(
+                TargetOrRetaliate<Zombie>()
+                    .attackablePredicate { entity -> entity !is Zombie },
+                AlertAboutAttackTarget()
+            ),
             OneRandomBehaviour(
                 SetPlayerLookTarget(),
                 SetRandomLookTarget()
