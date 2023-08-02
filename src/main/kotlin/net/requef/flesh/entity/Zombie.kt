@@ -2,10 +2,12 @@ package net.requef.flesh.entity
 
 import net.minecraft.entity.EntityData
 import net.minecraft.entity.EntityType
+import net.minecraft.entity.LivingEntity
 import net.minecraft.entity.SpawnReason
 import net.minecraft.entity.ai.brain.Brain
 import net.minecraft.entity.attribute.DefaultAttributeContainer
 import net.minecraft.entity.mob.ZombieEntity
+import net.minecraft.entity.passive.AnimalEntity
 import net.minecraft.entity.passive.IronGolemEntity
 import net.minecraft.entity.passive.SnowGolemEntity
 import net.minecraft.entity.player.PlayerEntity
@@ -17,9 +19,9 @@ import net.requef.flesh.ai.AlertAboutAttackTarget
 import net.tslat.smartbrainlib.api.SmartBrainOwner
 import net.tslat.smartbrainlib.api.core.BrainActivityGroup
 import net.tslat.smartbrainlib.api.core.SmartBrainProvider
+import net.tslat.smartbrainlib.api.core.behaviour.AllApplicableBehaviours
 import net.tslat.smartbrainlib.api.core.behaviour.FirstApplicableBehaviour
 import net.tslat.smartbrainlib.api.core.behaviour.OneRandomBehaviour
-import net.tslat.smartbrainlib.api.core.behaviour.SequentialBehaviour
 import net.tslat.smartbrainlib.api.core.behaviour.custom.attack.AnimatableMeleeAttack
 import net.tslat.smartbrainlib.api.core.behaviour.custom.look.LookAtTarget
 import net.tslat.smartbrainlib.api.core.behaviour.custom.misc.AvoidSun
@@ -33,6 +35,7 @@ import net.tslat.smartbrainlib.api.core.behaviour.custom.target.SetPlayerLookTar
 import net.tslat.smartbrainlib.api.core.behaviour.custom.target.SetRandomLookTarget
 import net.tslat.smartbrainlib.api.core.behaviour.custom.target.TargetOrRetaliate
 import net.tslat.smartbrainlib.api.core.sensor.ExtendedSensor
+import net.tslat.smartbrainlib.api.core.sensor.custom.GenericAttackTargetSensor
 import net.tslat.smartbrainlib.api.core.sensor.vanilla.HurtBySensor
 import net.tslat.smartbrainlib.api.core.sensor.vanilla.NearbyLivingEntitySensor
 import net.tslat.smartbrainlib.api.core.sensor.vanilla.NearbyPlayersSensor
@@ -110,6 +113,9 @@ open class Zombie(entityType: EntityType<out ZombieEntity>, world: World)
         return result
     }
 
+    override fun canTarget(target: LivingEntity): Boolean =
+        super.canTarget(target) && (target is AnimalEntity || target is PlayerEntity || target is IronGolemEntity || target is SnowGolemEntity)
+
     @Suppress("KotlinConstantConditions")
     // Since Brain.Profile is a final class, kotlin will issue a warning about an always-fail cast.
     // However, the cast will proceed as normal because of an SmartBrainLib's access widener,
@@ -124,10 +130,9 @@ open class Zombie(entityType: EntityType<out ZombieEntity>, world: World)
     override fun getSensors() = listOf<ExtendedSensor<Zombie>>(
         NearbyPlayersSensor(),
         NearbyLivingEntitySensor<Zombie>()
-            .setPredicate { target, _ -> target is PlayerEntity
-                    || target is IronGolemEntity
-                    || target is SnowGolemEntity},
-        HurtBySensor<Zombie>().setPredicate { _, entity -> entity !is Zombie }
+            .setPredicate { target, _ -> canTarget(target) },
+        HurtBySensor<Zombie>().setPredicate { _, entity -> entity !is Zombie },
+        GenericAttackTargetSensor()
     )
 
     override fun getCoreTasks(): BrainActivityGroup<out Zombie> = BrainActivityGroup.coreTasks(
@@ -139,7 +144,7 @@ open class Zombie(entityType: EntityType<out ZombieEntity>, world: World)
 
     override fun getIdleTasks(): BrainActivityGroup<out Zombie> = BrainActivityGroup.idleTasks(
         FirstApplicableBehaviour(
-            SequentialBehaviour(
+            AllApplicableBehaviours(
                 TargetOrRetaliate<Zombie>()
                     .attackablePredicate { entity -> entity !is Zombie },
                 AlertAboutAttackTarget()

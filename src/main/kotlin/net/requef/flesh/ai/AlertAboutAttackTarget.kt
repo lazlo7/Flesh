@@ -64,7 +64,7 @@ class AlertAboutAttackTarget<T : MobEntity> : ExtendedBehaviour<T>() {
 
         responders.forEach {
             Flesh.logger.info("[AlertAboutAttackTarget] ${broadcaster.id} alerted ${it.id}")
-            BrainUtils.setMemory(it, MemoryModuleType.ATTACK_TARGET, broadcaster.target)
+            BrainUtils.setTargetOfEntity(it, BrainUtils.getTargetOfEntity(broadcaster))
         }
     }
 }
