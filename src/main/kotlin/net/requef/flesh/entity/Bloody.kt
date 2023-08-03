@@ -16,6 +16,7 @@ import net.minecraft.util.math.floatprovider.ConstantFloatProvider
 import net.minecraft.world.World
 import net.requef.flesh.ai.AlertAboutAttackTarget
 import net.tslat.smartbrainlib.api.core.BrainActivityGroup
+import net.tslat.smartbrainlib.api.core.behaviour.AllApplicableBehaviours
 import net.tslat.smartbrainlib.api.core.behaviour.ExtendedBehaviour
 import net.tslat.smartbrainlib.api.core.behaviour.FirstApplicableBehaviour
 import net.tslat.smartbrainlib.api.core.behaviour.OneRandomBehaviour
@@ -73,7 +74,7 @@ class Bloody(val type: Type, entityType: EntityType<out ZombieEntity>, world: Wo
 
     override fun getIdleTasks(): BrainActivityGroup<out Zombie> = BrainActivityGroup.idleTasks(
         FirstApplicableBehaviour(
-            SequentialBehaviour(
+            AllApplicableBehaviours(
                 TargetOrRetaliate<Zombie>()
                     .attackablePredicate { entity -> entity !is Zombie },
                 AlertAboutAttackTarget()
