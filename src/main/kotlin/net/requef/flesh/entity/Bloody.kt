@@ -15,7 +15,6 @@ import net.minecraft.server.world.ServerWorld
 import net.minecraft.util.math.floatprovider.ConstantFloatProvider
 import net.minecraft.world.World
 import net.requef.flesh.ai.AlertAboutAttackTarget
-import net.requef.flesh.ai.PrioritizedTargetOrRetaliate
 import net.requef.flesh.ai.PropagateAttackTargetAlert
 import net.tslat.smartbrainlib.api.core.BrainActivityGroup
 import net.tslat.smartbrainlib.api.core.behaviour.AllApplicableBehaviours
@@ -38,8 +37,7 @@ class Bloody(val type: Type, entityType: EntityType<out ZombieEntity>, world: Wo
         fun createBloodyZombie(entityType: EntityType<out ZombieEntity>, world: World) = when (world.random.nextFloat()) {
             in 0.5f..1.0f -> Bloody(Type.SOMEWHAT_MUTILATED, entityType, world)
             in 0.15f..0.5f -> Bloody(Type.MUTILATED, entityType, world)
-            in 0.0f..0.15f -> Bloody(Type.EXTREMELY_MUTILATED, entityType, world)
-            else -> throw AssertionError("Unreachable.")
+            else -> Bloody(Type.EXTREMELY_MUTILATED, entityType, world)
         }
 
         fun createBloodyAttributes() = createFleshZombieAttributes()
@@ -104,28 +102,24 @@ class Bloody(val type: Type, entityType: EntityType<out ZombieEntity>, world: Wo
     )
 
     enum class Type(
-        val textureName: String,
         val attributeBonusName: String,
         val healthIncrease: Double,
         val speedIncrease: Double,
         val attackDamageIncrease: Double
     ) {
         SOMEWHAT_MUTILATED(
-            "variant1.png",
             "Bloodlust I",
             5.0,
             0.02,
             1.0
         ),
         MUTILATED(
-            "variant2.png",
             "Bloodlust II",
             12.0,
             0.0575,
             1.8
         ),
         EXTREMELY_MUTILATED(
-            "variant3.png",
             "Bloodlust III",
             20.0,
             0.115,
