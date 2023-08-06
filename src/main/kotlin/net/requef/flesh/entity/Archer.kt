@@ -16,6 +16,7 @@ import net.minecraft.sound.SoundEvents
 import net.minecraft.util.math.random.Random
 import net.minecraft.world.LocalDifficulty
 import net.minecraft.world.World
+import net.requef.flesh.ai.PrioritizedTargetOrRetaliate
 import net.tslat.smartbrainlib.api.core.BrainActivityGroup
 import net.tslat.smartbrainlib.api.core.behaviour.custom.attack.BowAttack
 import net.tslat.smartbrainlib.api.core.behaviour.custom.look.LookAtTarget
@@ -103,7 +104,8 @@ class Archer(entityType: EntityType<out ZombieEntity>, world: World)
             .speedMod(1.15f)
             .stopStrafingWhen {entity -> !isHoldingBow(entity) }
             .startCondition(::isHoldingBow),
-        MoveToWalkTarget<Archer>()
+        MoveToWalkTarget<Archer>(),
+        PrioritizedTargetOrRetaliate<Archer>().gradeTarget(::gradeTarget).cooldownFor { 20 },
     )
 
     override fun getFightTasks(): BrainActivityGroup<out Zombie> = BrainActivityGroup.fightTasks(

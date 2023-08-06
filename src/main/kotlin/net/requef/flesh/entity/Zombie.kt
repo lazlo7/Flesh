@@ -16,6 +16,8 @@ import net.minecraft.world.LocalDifficulty
 import net.minecraft.world.ServerWorldAccess
 import net.minecraft.world.World
 import net.requef.flesh.ai.AlertAboutAttackTarget
+import net.requef.flesh.ai.PrioritizedTargetOrRetaliate
+import net.requef.flesh.ai.PropagateAttackTargetAlert
 import net.tslat.smartbrainlib.api.SmartBrainOwner
 import net.tslat.smartbrainlib.api.core.BrainActivityGroup
 import net.tslat.smartbrainlib.api.core.SmartBrainProvider
@@ -33,7 +35,6 @@ import net.tslat.smartbrainlib.api.core.behaviour.custom.path.SetWalkTargetToAtt
 import net.tslat.smartbrainlib.api.core.behaviour.custom.target.InvalidateAttackTarget
 import net.tslat.smartbrainlib.api.core.behaviour.custom.target.SetPlayerLookTarget
 import net.tslat.smartbrainlib.api.core.behaviour.custom.target.SetRandomLookTarget
-import net.tslat.smartbrainlib.api.core.behaviour.custom.target.TargetOrRetaliate
 import net.tslat.smartbrainlib.api.core.sensor.ExtendedSensor
 import net.tslat.smartbrainlib.api.core.sensor.custom.GenericAttackTargetSensor
 import net.tslat.smartbrainlib.api.core.sensor.vanilla.HurtBySensor
@@ -114,7 +115,21 @@ open class Zombie(entityType: EntityType<out ZombieEntity>, world: World)
     }
 
     override fun canTarget(target: LivingEntity): Boolean =
-        super.canTarget(target) && (target is AnimalEntity || target is PlayerEntity || target is IronGolemEntity || target is SnowGolemEntity)
+        super.canTarget(target) && gradeTarget(target) > 0
+
+    protected fun gradeTarget(target: LivingEntity): Int {
+        if (!target.isPartOfGame) {
+            return 0
+        }
+
+        return when(target) {
+            is AnimalEntity -> 1
+            is SnowGolemEntity -> 2
+            is IronGolemEntity -> 3
+            is PlayerEntity -> 4
+            else -> 0
+        }
+    }
 
     @Suppress("KotlinConstantConditions")
     // Since Brain.Profile is a final class, kotlin will issue a warning about an always-fail cast.
@@ -139,15 +154,15 @@ open class Zombie(entityType: EntityType<out ZombieEntity>, world: World)
         AvoidSun<Zombie>(),
         EscapeSun<Zombie>(),
         LookAtTarget<Zombie>(),
-        MoveToWalkTarget<Zombie>()
+        MoveToWalkTarget<Zombie>(),
+        PrioritizedTargetOrRetaliate<Zombie>().gradeTarget(::gradeTarget).cooldownFor { 20 },
     )
 
     override fun getIdleTasks(): BrainActivityGroup<out Zombie> = BrainActivityGroup.idleTasks(
         FirstApplicableBehaviour(
             AllApplicableBehaviours(
-                TargetOrRetaliate<Zombie>()
-                    .attackablePredicate { entity -> entity !is Zombie },
-                AlertAboutAttackTarget()
+                AlertAboutAttackTarget<Zombie>().gradeTarget(::gradeTarget),
+                PropagateAttackTargetAlert<Zombie>().gradeTarget(::gradeTarget)
             ),
             OneRandomBehaviour(
                 SetPlayerLookTarget(),

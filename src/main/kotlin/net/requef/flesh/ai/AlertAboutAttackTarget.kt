@@ -2,7 +2,6 @@ package net.requef.flesh.ai
 
 import com.mojang.datafixers.util.Pair
 import it.unimi.dsi.fastutil.objects.ObjectArrayList
-import net.minecraft.entity.LivingEntity
 import net.minecraft.entity.ai.brain.MemoryModuleState
 import net.minecraft.entity.ai.brain.MemoryModuleType
 import net.minecraft.entity.mob.MobEntity
@@ -14,10 +13,9 @@ import net.tslat.smartbrainlib.util.BrainUtils
 /**
  * Behaves like TargetOrRetaliate::alertAllies, but doesn't depend on mob's follow range.
  * Alerts allies (mobs of the same type or derived type)
- * by setting their ATTACK_TARGET to given ATTACK_TARGET using given range.
- * Alerted allies further propagate the alert.
+ * by setting their attackTargetAlert to broadcaster's target.
  */
-class AlertAboutAttackTarget<T : MobEntity> : ExtendedBehaviour<T>() {
+open class AlertAboutAttackTarget<T : MobEntity> : ExtendedBehaviour<T>() {
     companion object {
         private val memoryRequirements: List<Pair<MemoryModuleType<*>, MemoryModuleState>> =
             ObjectArrayList.of(
@@ -26,8 +24,10 @@ class AlertAboutAttackTarget<T : MobEntity> : ExtendedBehaviour<T>() {
             )
     }
 
-    private var range = 30.0
-    private var alertCooldown = 30 * 20
+    private var range = 45.0
+    private var alertCooldown = 10 * 20
+    private var alertMemoryDuration = 10 * 20
+    private var targetGrader: TargetGrader = { 0 }
 
     fun range(range: Double): AlertAboutAttackTarget<T> {
         this.range = range
@@ -39,32 +39,48 @@ class AlertAboutAttackTarget<T : MobEntity> : ExtendedBehaviour<T>() {
         return this
     }
 
+    fun gradeTarget(grader: TargetGrader): AlertAboutAttackTarget<T> {
+        this.targetGrader = grader
+        return this
+    }
+
     override fun getMemoryRequirements() = AlertAboutAttackTarget.memoryRequirements
 
     override fun start(entity: T) {
-        setCooldownMemory(entity)
         alertOthers(entity)
     }
 
-    private fun setCooldownMemory(entity: LivingEntity) = BrainUtils.setForgettableMemory(
-        entity,
-        FleshMemoryModuleTypes.alertAboutAttackTargetCooldown,
-        MinecraftUnit.INSTANCE,
-        alertCooldown
-    )
+    protected open fun getBroadcastedPrioritizedTarget(broadcaster: T): PrioritizedTarget {
+        val target = BrainUtils.getTargetOfEntity(broadcaster)!!
+        return PrioritizedTarget(target, targetGrader(target))
+    }
 
     private fun alertOthers(broadcaster: T) {
+        BrainUtils.setForgettableMemory(
+            broadcaster,
+            FleshMemoryModuleTypes.alertAboutAttackTargetCooldown,
+            MinecraftUnit.INSTANCE,
+            alertCooldown
+        )
+
+        val prioritizedTarget = getBroadcastedPrioritizedTarget(broadcaster)
+
         val responders = broadcaster.world.getEntitiesByType(
             TypeFilter.instanceOf(broadcaster.javaClass),
-            broadcaster.boundingBox.expand(range)
-        ) {
+            broadcaster.boundingBox.expand(range)) {
             entity -> !BrainUtils.hasMemory(entity, FleshMemoryModuleTypes.alertAboutAttackTargetCooldown)
-                && !BrainUtils.hasMemory(entity, MemoryModuleType.ATTACK_TARGET)
         }
 
         responders.forEach {
-            Flesh.logger.info("[AlertAboutAttackTarget] ${broadcaster.id} alerted ${it.id}")
-            BrainUtils.setTargetOfEntity(it, BrainUtils.getTargetOfEntity(broadcaster))
+            val currentAlert = BrainUtils.getMemory(it, FleshMemoryModuleTypes.attackTargetAlert)
+            if (currentAlert == null || prioritizedTarget.priority > currentAlert.priority) {
+                BrainUtils.setForgettableMemory(
+                    it,
+                    FleshMemoryModuleTypes.attackTargetAlert,
+                    prioritizedTarget,
+                    alertMemoryDuration
+                )
+            }
         }
     }
 }

@@ -15,19 +15,19 @@ import net.minecraft.server.world.ServerWorld
 import net.minecraft.util.math.floatprovider.ConstantFloatProvider
 import net.minecraft.world.World
 import net.requef.flesh.ai.AlertAboutAttackTarget
+import net.requef.flesh.ai.PrioritizedTargetOrRetaliate
+import net.requef.flesh.ai.PropagateAttackTargetAlert
 import net.tslat.smartbrainlib.api.core.BrainActivityGroup
 import net.tslat.smartbrainlib.api.core.behaviour.AllApplicableBehaviours
 import net.tslat.smartbrainlib.api.core.behaviour.ExtendedBehaviour
 import net.tslat.smartbrainlib.api.core.behaviour.FirstApplicableBehaviour
 import net.tslat.smartbrainlib.api.core.behaviour.OneRandomBehaviour
-import net.tslat.smartbrainlib.api.core.behaviour.SequentialBehaviour
 import net.tslat.smartbrainlib.api.core.behaviour.custom.attack.AnimatableMeleeAttack
 import net.tslat.smartbrainlib.api.core.behaviour.custom.misc.Idle
 import net.tslat.smartbrainlib.api.core.behaviour.custom.path.SetRandomWalkTarget
 import net.tslat.smartbrainlib.api.core.behaviour.custom.path.SetWalkTargetToAttackTarget
 import net.tslat.smartbrainlib.api.core.behaviour.custom.target.InvalidateAttackTarget
 import net.tslat.smartbrainlib.api.core.behaviour.custom.target.SetRandomLookTarget
-import net.tslat.smartbrainlib.api.core.behaviour.custom.target.TargetOrRetaliate
 import net.tslat.smartbrainlib.util.BrainUtils
 import java.util.function.BiPredicate
 import kotlin.math.pow
@@ -75,9 +75,8 @@ class Bloody(val type: Type, entityType: EntityType<out ZombieEntity>, world: Wo
     override fun getIdleTasks(): BrainActivityGroup<out Zombie> = BrainActivityGroup.idleTasks(
         FirstApplicableBehaviour(
             AllApplicableBehaviours(
-                TargetOrRetaliate<Zombie>()
-                    .attackablePredicate { entity -> entity !is Zombie },
-                AlertAboutAttackTarget()
+                AlertAboutAttackTarget<Zombie>().gradeTarget(::gradeTarget),
+                PropagateAttackTargetAlert<Zombie>().gradeTarget(::gradeTarget)
             ),
             SetRandomLookTarget<Bloody>()
                 .lookChance(ConstantFloatProvider.create(0.2f))
