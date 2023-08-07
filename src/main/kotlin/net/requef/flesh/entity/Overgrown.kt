@@ -22,11 +22,6 @@ class Overgrown(entityType: EntityType<out ZombieEntity>, world: World) : Zombie
     override val attackAnimationName: String
         get() = "animation.overgrown.attack"
 
-    override fun registerControllers(registrar: AnimatableManager.ControllerRegistrar) {
-        super.registerControllers(registrar)
-        registrar.add(AnimationController(this, "attackController", 0, ::attackPredicate))
-    }
-
     override fun <T> predicate(state: AnimationState<T>): PlayState where T: GeoAnimatable {
         if (state.isMoving) {
             return state.setAndContinue(RawAnimation.begin()
