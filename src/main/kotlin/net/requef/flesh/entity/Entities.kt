@@ -36,10 +36,13 @@ object Entities {
 
     val bloody: EntityType<Bloody> = register("bloody", Bloody::createBloodyZombie)
 
+    val bomber: EntityType<Bomber> = register("bomber", ::Bomber)
+
     fun registerAttributes() {
         FabricDefaultAttributeRegistry.register(zombie, Zombie.createFleshZombieAttributes())
         FabricDefaultAttributeRegistry.register(overgrown, Overgrown.createOvergrownAttributes())
         FabricDefaultAttributeRegistry.register(archer, Archer.createArcherAttributes())
         FabricDefaultAttributeRegistry.register(bloody, Bloody.createBloodyAttributes())
+        FabricDefaultAttributeRegistry.register(bomber, Bomber.createBomberAttributes())
     }
 }
