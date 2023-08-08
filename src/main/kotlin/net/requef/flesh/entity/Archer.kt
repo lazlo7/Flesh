@@ -111,9 +111,11 @@ class Archer(entityType: EntityType<out ZombieEntity>, world: World)
     override fun getFightTasks(): BrainActivityGroup<out Zombie> = BrainActivityGroup.fightTasks(
         InvalidateAttackTarget<Archer>(),
         // Zombie archer can't melee attack by design.
-        ArcherBowAttack<Archer>(25, 40)
-            .attackInterval { _ -> 65 }
-            .attackRadius(bowRange)
+        BowAttack<Archer>(40)
+            .attackInterval { _ -> 25 }
+            // For some reason the attackRadius is set to zero when bowRange val is used.
+            // So for now it will remain a "magical constant" (DON'T FIX).
+            .attackRadius(30.0f)
     )
 
     private fun isHoldingBow(entity: LivingEntity) = entity.isHolding {stack -> stack.item is BowItem }
