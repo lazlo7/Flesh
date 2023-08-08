@@ -4,7 +4,6 @@ import net.minecraft.entity.EntityType
 import net.minecraft.entity.EquipmentSlot
 import net.minecraft.entity.LivingEntity
 import net.minecraft.entity.ai.RangedAttackMob
-import net.minecraft.entity.ai.brain.MemoryModuleType
 import net.minecraft.entity.attribute.DefaultAttributeContainer
 import net.minecraft.entity.attribute.EntityAttributes
 import net.minecraft.entity.mob.ZombieEntity
@@ -16,7 +15,9 @@ import net.minecraft.sound.SoundEvents
 import net.minecraft.util.math.random.Random
 import net.minecraft.world.LocalDifficulty
 import net.minecraft.world.World
+import net.requef.flesh.ai.AlertAboutAttackTarget
 import net.requef.flesh.ai.PrioritizedTargetOrRetaliate
+import net.requef.flesh.ai.PropagateAttackTargetAlert
 import net.tslat.smartbrainlib.api.core.BrainActivityGroup
 import net.tslat.smartbrainlib.api.core.behaviour.custom.attack.BowAttack
 import net.tslat.smartbrainlib.api.core.behaviour.custom.look.LookAtTarget
@@ -25,7 +26,6 @@ import net.tslat.smartbrainlib.api.core.behaviour.custom.move.EscapeSun
 import net.tslat.smartbrainlib.api.core.behaviour.custom.move.MoveToWalkTarget
 import net.tslat.smartbrainlib.api.core.behaviour.custom.move.StrafeTarget
 import net.tslat.smartbrainlib.api.core.behaviour.custom.target.InvalidateAttackTarget
-import net.tslat.smartbrainlib.util.BrainUtils
 import software.bernie.geckolib.core.animatable.GeoAnimatable
 import software.bernie.geckolib.core.animation.*
 import software.bernie.geckolib.core.`object`.PlayState
@@ -105,38 +105,20 @@ class Archer(entityType: EntityType<out ZombieEntity>, world: World)
             .stopStrafingWhen {entity -> !isHoldingBow(entity) }
             .startCondition(::isHoldingBow),
         MoveToWalkTarget<Archer>(),
-        PrioritizedTargetOrRetaliate<Archer>().gradeTarget(::gradeTarget).cooldownFor { 20 },
+        AlertAboutAttackTarget<Zombie>().gradeTarget(::gradeTarget),
+        PropagateAttackTargetAlert<Zombie>().gradeTarget(::gradeTarget)
     )
 
     override fun getFightTasks(): BrainActivityGroup<out Zombie> = BrainActivityGroup.fightTasks(
         InvalidateAttackTarget<Archer>(),
+        PrioritizedTargetOrRetaliate<Zombie>().gradeTarget(::gradeTarget).cooldownFor { 20 },
         // Zombie archer can't melee attack by design.
-        ArcherBowAttack<Archer>(25, 40)
-            .attackInterval { _ -> 65 }
-            .attackRadius(bowRange)
+        BowAttack<Archer>(40)
+            .attackInterval { _ -> 25 }
+            // For some reason the attackRadius is set to zero when bowRange val is used.
+            // So for now it will remain a "magical constant" (DON'T FIX).
+            .attackRadius(30.0f)
     )
 
     private fun isHoldingBow(entity: LivingEntity) = entity.isHolding {stack -> stack.item is BowItem }
-
-    class ArcherBowAttack<T>(
-        arrowCooldownTicks: Int,
-        private val aimingDurationTicks: Int,
-    ) : BowAttack<T>(arrowCooldownTicks) where T: LivingEntity, T: RangedAttackMob {
-        override fun doDelayedAction(entity: T) {
-            if (target == null
-                || !BrainUtils.canSee(entity, target)
-                || entity.squaredDistanceTo(target) > attackRadius
-                || entity.itemUseTime < aimingDurationTicks) return
-
-            entity.attack(target, BowItem.getPullProgress(entity.itemUseTime))
-            entity.clearActiveItem()
-
-            BrainUtils.setForgettableMemory(
-                entity,
-                MemoryModuleType.ATTACK_COOLING_DOWN,
-                true,
-                attackIntervalSupplier.apply(entity)
-            )
-        }
-    }
 }

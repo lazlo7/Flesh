@@ -46,8 +46,9 @@ class PrioritizedTargetOrRetaliate<T : MobEntity> : ExtendedBehaviour<T>() {
         val currentTarget = BrainUtils.getTargetOfEntity(entity)
         val target = pickTarget(potentialTarget, currentTarget)
 
-        if (target != currentTarget) {
+        if (target == null || target != currentTarget) {
             BrainUtils.setTargetOfEntity(entity, target)
+            BrainUtils.clearMemory(entity, MemoryModuleType.CANT_REACH_WALK_TARGET_SINCE)
         }
     }
 
