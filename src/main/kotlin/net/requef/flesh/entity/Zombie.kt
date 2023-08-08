@@ -21,7 +21,6 @@ import net.requef.flesh.ai.PropagateAttackTargetAlert
 import net.tslat.smartbrainlib.api.SmartBrainOwner
 import net.tslat.smartbrainlib.api.core.BrainActivityGroup
 import net.tslat.smartbrainlib.api.core.SmartBrainProvider
-import net.tslat.smartbrainlib.api.core.behaviour.AllApplicableBehaviours
 import net.tslat.smartbrainlib.api.core.behaviour.FirstApplicableBehaviour
 import net.tslat.smartbrainlib.api.core.behaviour.OneRandomBehaviour
 import net.tslat.smartbrainlib.api.core.behaviour.custom.attack.AnimatableMeleeAttack
@@ -155,19 +154,15 @@ open class Zombie(entityType: EntityType<out ZombieEntity>, world: World)
         EscapeSun<Zombie>(),
         LookAtTarget<Zombie>(),
         MoveToWalkTarget<Zombie>(),
-        PrioritizedTargetOrRetaliate<Zombie>().gradeTarget(::gradeTarget).cooldownFor { 20 },
+        AlertAboutAttackTarget<Zombie>().gradeTarget(::gradeTarget),
+        PropagateAttackTargetAlert<Zombie>().gradeTarget(::gradeTarget)
     )
 
     override fun getIdleTasks(): BrainActivityGroup<out Zombie> = BrainActivityGroup.idleTasks(
         FirstApplicableBehaviour(
-            AllApplicableBehaviours(
-                AlertAboutAttackTarget<Zombie>().gradeTarget(::gradeTarget),
-                PropagateAttackTargetAlert<Zombie>().gradeTarget(::gradeTarget)
-            ),
-            OneRandomBehaviour(
-                SetPlayerLookTarget(),
-                SetRandomLookTarget()
-            )
+            PrioritizedTargetOrRetaliate<Zombie>().gradeTarget(::gradeTarget).cooldownFor { 20 },
+            SetPlayerLookTarget(),
+            SetRandomLookTarget()
         ),
         OneRandomBehaviour(
             SetRandomWalkTarget<Zombie>().setRadius(20.0),
@@ -177,6 +172,8 @@ open class Zombie(entityType: EntityType<out ZombieEntity>, world: World)
 
     override fun getFightTasks(): BrainActivityGroup<out Zombie> = BrainActivityGroup.fightTasks(
         InvalidateAttackTarget<Zombie>(),
+        // Always try to re-evaluate attack target, even while fighting.
+        PrioritizedTargetOrRetaliate<Zombie>().gradeTarget(::gradeTarget).cooldownFor { 20 },
         SetWalkTargetToAttackTarget<Zombie>(),
         AnimatableMeleeAttack<Zombie>(0)
     )

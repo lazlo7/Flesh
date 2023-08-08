@@ -14,12 +14,9 @@ import net.minecraft.entity.mob.ZombieEntity
 import net.minecraft.server.world.ServerWorld
 import net.minecraft.util.math.floatprovider.ConstantFloatProvider
 import net.minecraft.world.World
-import net.requef.flesh.ai.AlertAboutAttackTarget
-import net.requef.flesh.ai.PropagateAttackTargetAlert
+import net.requef.flesh.ai.PrioritizedTargetOrRetaliate
 import net.tslat.smartbrainlib.api.core.BrainActivityGroup
-import net.tslat.smartbrainlib.api.core.behaviour.AllApplicableBehaviours
 import net.tslat.smartbrainlib.api.core.behaviour.ExtendedBehaviour
-import net.tslat.smartbrainlib.api.core.behaviour.FirstApplicableBehaviour
 import net.tslat.smartbrainlib.api.core.behaviour.OneRandomBehaviour
 import net.tslat.smartbrainlib.api.core.behaviour.custom.attack.AnimatableMeleeAttack
 import net.tslat.smartbrainlib.api.core.behaviour.custom.misc.Idle
@@ -71,15 +68,10 @@ class Bloody(val type: Type, entityType: EntityType<out ZombieEntity>, world: Wo
     }
 
     override fun getIdleTasks(): BrainActivityGroup<out Zombie> = BrainActivityGroup.idleTasks(
-        FirstApplicableBehaviour(
-            AllApplicableBehaviours(
-                AlertAboutAttackTarget<Zombie>().gradeTarget(::gradeTarget),
-                PropagateAttackTargetAlert<Zombie>().gradeTarget(::gradeTarget)
-            ),
-            SetRandomLookTarget<Bloody>()
-                .lookChance(ConstantFloatProvider.create(0.2f))
-                .lookTime { entity -> entity.random.nextInt(10) + 10 }
-        ),
+        PrioritizedTargetOrRetaliate<Zombie>().gradeTarget(::gradeTarget).cooldownFor { 20 },
+        SetRandomLookTarget<Bloody>()
+            .lookChance(ConstantFloatProvider.create(0.2f))
+            .lookTime { entity -> entity.random.nextInt(10) + 10 },
         OneRandomBehaviour(
             SetRandomWalkTarget<Bloody>().setRadius(1.0).speedModifier(1.25f),
             OneRandomBehaviour(
@@ -91,6 +83,7 @@ class Bloody(val type: Type, entityType: EntityType<out ZombieEntity>, world: Wo
 
     override fun getFightTasks(): BrainActivityGroup<out Zombie> = BrainActivityGroup.fightTasks(
         InvalidateAttackTarget<Bloody>(),
+        PrioritizedTargetOrRetaliate<Zombie>().gradeTarget(::gradeTarget).cooldownFor { 20 },
         SetWalkTargetToAttackTarget<Bloody>(),
         AnimatableMeleeAttack<Bloody>(0),
         LungeTowardsAttackTarget<Bloody>(0.3)
