@@ -2,17 +2,24 @@ package net.requef.flesh.entity
 
 import com.mojang.datafixers.util.Pair
 import it.unimi.dsi.fastutil.objects.ObjectArrayList
+import net.minecraft.entity.EntityData
 import net.minecraft.entity.EntityType
 import net.minecraft.entity.LivingEntity
+import net.minecraft.entity.SpawnReason
 import net.minecraft.entity.ai.brain.MemoryModuleState
 import net.minecraft.entity.ai.brain.MemoryModuleType
 import net.minecraft.entity.attribute.EntityAttribute
 import net.minecraft.entity.attribute.EntityAttributeModifier
 import net.minecraft.entity.attribute.EntityAttributes
+import net.minecraft.entity.data.DataTracker
+import net.minecraft.entity.data.TrackedDataHandlerRegistry
 import net.minecraft.entity.mob.MobEntity
 import net.minecraft.entity.mob.ZombieEntity
+import net.minecraft.nbt.NbtCompound
 import net.minecraft.server.world.ServerWorld
 import net.minecraft.util.math.floatprovider.ConstantFloatProvider
+import net.minecraft.world.LocalDifficulty
+import net.minecraft.world.ServerWorldAccess
 import net.minecraft.world.World
 import net.requef.flesh.ai.PrioritizedTargetOrRetaliate
 import net.tslat.smartbrainlib.api.core.BrainActivityGroup
@@ -29,15 +36,47 @@ import java.util.function.BiPredicate
 import kotlin.math.pow
 
 
-class Bloody(val type: Type, entityType: EntityType<out ZombieEntity>, world: World) : Zombie(entityType, world) {
+class Bloody(entityType: EntityType<out ZombieEntity>, world: World) : Zombie(entityType, world) {
     companion object {
-        fun createBloodyZombie(entityType: EntityType<out ZombieEntity>, world: World) = when (world.random.nextFloat()) {
-            in 0.5f..1.0f -> Bloody(Type.SOMEWHAT_MUTILATED, entityType, world)
-            in 0.15f..0.5f -> Bloody(Type.MUTILATED, entityType, world)
-            else -> Bloody(Type.EXTREMELY_MUTILATED, entityType, world)
-        }
-
+        private val typeTracker = DataTracker.registerData(Bloody::class.java, TrackedDataHandlerRegistry.INTEGER)
+        private fun intToType(int: Int) = Type.values()[int]
+        private fun typeToInt(type: Type) = type.ordinal
         fun createBloodyAttributes() = createFleshZombieAttributes()
+    }
+
+    var type: Type
+        get() = intToType(dataTracker.get(typeTracker))
+        set(value) = dataTracker.set(typeTracker, typeToInt(value))
+
+    override fun initialize(
+        world: ServerWorldAccess,
+        difficulty: LocalDifficulty,
+        spawnReason: SpawnReason?,
+        entityData: EntityData?,
+        entityNbt: NbtCompound?
+    ): EntityData? {
+        val result = super.initialize(world, difficulty, spawnReason, entityData, entityNbt)
+        type = when (world.random.nextFloat()) {
+            in 0.5f..1.0f -> Type.SOMEWHAT_MUTILATED
+            in 0.15f..0.5f -> Type.MUTILATED
+            else -> Type.EXTREMELY_MUTILATED
+        }
+        return result
+    }
+
+    override fun initDataTracker() {
+        super.initDataTracker()
+        dataTracker.startTracking(typeTracker, 0)
+    }
+
+    override fun writeCustomDataToNbt(nbt: NbtCompound) {
+        super.writeCustomDataToNbt(nbt)
+        nbt.putInt("Type", typeToInt(type))
+    }
+
+    override fun readCustomDataFromNbt(nbt: NbtCompound) {
+        super.readCustomDataFromNbt(nbt)
+        type = intToType(nbt.getInt("Type"))
     }
 
     override fun applyAttributeModifiers(chanceMultiplier: Float) {

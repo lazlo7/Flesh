@@ -34,7 +34,7 @@ object Entities {
 
     val archer: EntityType<Archer> = register("archer", ::Archer)
 
-    val bloody: EntityType<Bloody> = register("bloody", Bloody::createBloodyZombie)
+    val bloody: EntityType<Bloody> = register("bloody", ::Bloody)
 
     val bomber: EntityType<Bomber> = register("bomber", ::Bomber)
 
