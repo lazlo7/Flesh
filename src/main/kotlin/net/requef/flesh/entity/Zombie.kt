@@ -93,7 +93,7 @@ open class Zombie(entityType: EntityType<out ZombieEntity>, world: World)
     override fun initGoals() { }
 
     override fun initialize(
-        world: ServerWorldAccess?,
+        world: ServerWorldAccess,
         difficulty: LocalDifficulty,
         spawnReason: SpawnReason?,
         entityData: EntityData?,
