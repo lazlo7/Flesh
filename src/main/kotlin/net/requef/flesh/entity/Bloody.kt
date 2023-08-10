@@ -1,5 +1,6 @@
 package net.requef.flesh.entity
 
+
 import com.mojang.datafixers.util.Pair
 import it.unimi.dsi.fastutil.objects.ObjectArrayList
 import net.minecraft.entity.EntityData
@@ -12,6 +13,7 @@ import net.minecraft.entity.attribute.EntityAttribute
 import net.minecraft.entity.attribute.EntityAttributeModifier
 import net.minecraft.entity.attribute.EntityAttributes
 import net.minecraft.entity.data.DataTracker
+import net.minecraft.entity.data.TrackedData
 import net.minecraft.entity.data.TrackedDataHandlerRegistry
 import net.minecraft.entity.mob.MobEntity
 import net.minecraft.entity.mob.ZombieEntity
@@ -32,12 +34,17 @@ import net.tslat.smartbrainlib.api.core.behaviour.custom.path.SetWalkTargetToAtt
 import net.tslat.smartbrainlib.api.core.behaviour.custom.target.InvalidateAttackTarget
 import net.tslat.smartbrainlib.api.core.behaviour.custom.target.SetRandomLookTarget
 import net.tslat.smartbrainlib.util.BrainUtils
+import java.util.*
 import java.util.function.BiPredicate
 import kotlin.math.pow
 
 
 class Bloody(entityType: EntityType<out ZombieEntity>, world: World) : Zombie(entityType, world) {
     companion object {
+        private val maxHealthAttributeUUID = UUID.fromString("923adb56-2723-47cf-a53f-08fe859a4149")
+        private val movementSpeedAttributeUUID = UUID.fromString("add6df5b-7c38-4887-8067-57b7dab58bd2")
+        private val attackDamageAttributeUUID = UUID.fromString("0ec01a0b-ca1d-40e4-aa80-9fff9896af8a")
+
         private val typeTracker = DataTracker.registerData(Bloody::class.java, TrackedDataHandlerRegistry.INTEGER)
         private fun intToType(int: Int) = Type.values()[int]
         private fun typeToInt(type: Type) = type.ordinal
@@ -64,6 +71,12 @@ class Bloody(entityType: EntityType<out ZombieEntity>, world: World) : Zombie(en
         return result
     }
 
+    override fun onTrackedDataSet(data: TrackedData<*>?) {
+        super.onTrackedDataSet(data)
+        if (world.isClient) return
+        if (data == typeTracker) updateTypeAttributes()
+    }
+
     override fun initDataTracker() {
         super.initDataTracker()
         dataTracker.startTracking(typeTracker, 0)
@@ -81,10 +94,18 @@ class Bloody(entityType: EntityType<out ZombieEntity>, world: World) : Zombie(en
 
     override fun applyAttributeModifiers(chanceMultiplier: Float) {
         super.applyAttributeModifiers(chanceMultiplier)
+        updateTypeAttributes()
+    }
 
-        val apply = { attribute: EntityAttribute, multiplier: Double ->
+    private fun updateTypeAttributes() {
+        val remove = { uuid: UUID, attribute: EntityAttribute ->
+            getAttributeInstance(attribute)?.tryRemoveModifier(uuid)
+        }
+
+        val apply = { uuid: UUID, attribute: EntityAttribute, multiplier: Double ->
             getAttributeInstance(attribute)?.addPersistentModifier(
                 EntityAttributeModifier(
+                    uuid,
                     type.attributeBonusName,
                     multiplier,
                     EntityAttributeModifier.Operation.ADDITION
@@ -92,10 +113,14 @@ class Bloody(entityType: EntityType<out ZombieEntity>, world: World) : Zombie(en
             )
         }
 
-        apply(EntityAttributes.GENERIC_MAX_HEALTH, type.healthIncrease)
+        remove(maxHealthAttributeUUID, EntityAttributes.GENERIC_MAX_HEALTH)
+        remove(movementSpeedAttributeUUID, EntityAttributes.GENERIC_MOVEMENT_SPEED)
+        remove(attackDamageAttributeUUID, EntityAttributes.GENERIC_ATTACK_DAMAGE)
+
+        apply(maxHealthAttributeUUID, EntityAttributes.GENERIC_MAX_HEALTH, type.healthIncrease)
         health = getAttributeValue(EntityAttributes.GENERIC_MAX_HEALTH).toFloat()
-        apply(EntityAttributes.GENERIC_MOVEMENT_SPEED, type.speedIncrease)
-        apply(EntityAttributes.GENERIC_ATTACK_DAMAGE, type.attackDamageIncrease)
+        apply(movementSpeedAttributeUUID, EntityAttributes.GENERIC_MOVEMENT_SPEED, type.speedIncrease)
+        apply(attackDamageAttributeUUID, EntityAttributes.GENERIC_ATTACK_DAMAGE, type.attackDamageIncrease)
     }
 
     override fun onLanding() {
