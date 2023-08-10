@@ -9,7 +9,7 @@ class BloodyModel : ZombieModel<Bloody>() {
             when (animatable.type) {
                 Bloody.Type.SOMEWHAT_MUTILATED -> "bloody1.geo.json"
                 Bloody.Type.MUTILATED -> "bloody2.geo.json"
-                Bloody.Type.EXTREMELY_MUTILATED -> "zombie.geo.json" 
+                Bloody.Type.EXTREMELY_MUTILATED -> "bloody3.geo.json" 
             }
         }")
 
