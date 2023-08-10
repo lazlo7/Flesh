@@ -2,18 +2,17 @@ package net.requef.flesh.entity
 
 import net.minecraft.block.BlockState
 import net.minecraft.block.Blocks
-import net.minecraft.entity.EntityData
-import net.minecraft.entity.EntityType
-import net.minecraft.entity.LivingEntity
-import net.minecraft.entity.SpawnReason
+import net.minecraft.entity.*
 import net.minecraft.entity.ai.brain.MemoryModuleType
 import net.minecraft.entity.data.DataTracker
 import net.minecraft.entity.data.TrackedDataHandlerRegistry
 import net.minecraft.entity.mob.MobEntity
 import net.minecraft.entity.mob.ZombieEntity
 import net.minecraft.entity.player.PlayerEntity
+import net.minecraft.item.ItemStack
 import net.minecraft.nbt.NbtCompound
 import net.minecraft.server.world.ServerWorld
+import net.minecraft.util.math.random.Random
 import net.minecraft.world.LocalDifficulty
 import net.minecraft.world.ServerWorldAccess
 import net.minecraft.world.World
@@ -55,6 +54,7 @@ class Bomber(entityType: EntityType<out ZombieEntity>, world: World) : Zombie(en
             in 0.2f..0.6f -> Type.LEFT_CARRIED
             else -> Type.BOTH_CARRIED
         }
+        setCanPickUpLoot(false)
         return result
     }
 
@@ -71,6 +71,13 @@ class Bomber(entityType: EntityType<out ZombieEntity>, world: World) : Zombie(en
     override fun readCustomDataFromNbt(nbt: NbtCompound) {
         super.readCustomDataFromNbt(nbt)
         type = intToType(nbt.getInt("Type"))
+    }
+
+    override fun initEquipment(random: Random?, localDifficulty: LocalDifficulty?) {
+        super.initEquipment(random, localDifficulty)
+        // Bomber can't equip hand items.
+        equipStack(EquipmentSlot.MAINHAND, ItemStack.EMPTY)
+        equipStack(EquipmentSlot.OFFHAND, ItemStack.EMPTY)
     }
 
     override fun canTarget(target: LivingEntity): Boolean {
