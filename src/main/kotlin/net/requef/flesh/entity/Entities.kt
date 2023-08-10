@@ -26,6 +26,12 @@ object Entities {
             ).build()
     )
 
+    private fun <T : Entity> registerNether(
+        id: String,
+        entity: EntityFactory<T>,
+        builder: (FabricEntityTypeBuilder<T>) -> FabricEntityTypeBuilder<T> = { b -> b }
+    ) = register(id, entity) { builder(it.fireImmune()) }
+
     val zombie: EntityType<Zombie> = register("zombie", ::Zombie)
 
     val overgrown: EntityType<Overgrown> = register("overgrown", ::Overgrown) {
@@ -38,11 +44,29 @@ object Entities {
 
     val bomber: EntityType<Bomber> = register("bomber", ::Bomber)
 
+    val netherZombie: EntityType<Zombie> = registerNether("nether_zombie", ::Zombie)
+
+    val netherOvergrown: EntityType<Overgrown> = registerNether("nether_overgrown", ::Overgrown) {
+        it.dimensions(EntityDimensions.fixed(0.75f, 2.6f))
+    }
+
+    val netherArcher: EntityType<Archer> = registerNether("nether_archer", ::Archer)
+
+    val netherBloody: EntityType<Bloody> = registerNether("nether_bloody", ::Bloody)
+
+    val netherBomber: EntityType<Bomber> = registerNether("nether_bomber", ::Bomber)
+
     fun registerAttributes() {
         FabricDefaultAttributeRegistry.register(zombie, Zombie.createFleshZombieAttributes())
         FabricDefaultAttributeRegistry.register(overgrown, Overgrown.createOvergrownAttributes())
         FabricDefaultAttributeRegistry.register(archer, Archer.createArcherAttributes())
         FabricDefaultAttributeRegistry.register(bloody, Bloody.createBloodyAttributes())
         FabricDefaultAttributeRegistry.register(bomber, Bomber.createBomberAttributes())
+
+        FabricDefaultAttributeRegistry.register(netherZombie, Zombie.createFleshZombieAttributes())
+        FabricDefaultAttributeRegistry.register(netherOvergrown, Overgrown.createOvergrownAttributes())
+        FabricDefaultAttributeRegistry.register(netherArcher, Archer.createArcherAttributes())
+        FabricDefaultAttributeRegistry.register(netherBloody, Bloody.createBloodyAttributes())
+        FabricDefaultAttributeRegistry.register(netherBomber, Bomber.createBomberAttributes())
     }
 }

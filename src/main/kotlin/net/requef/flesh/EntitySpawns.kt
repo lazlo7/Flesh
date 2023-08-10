@@ -33,6 +33,21 @@ object EntitySpawns {
 
         addOverworld(Entities.bomber, 20, 1, 1)
         SpawnRestriction.register(Entities.bomber, SpawnRestriction.Location.ON_GROUND, Heightmap.Type.MOTION_BLOCKING_NO_LEAVES, HostileEntity::canSpawnInDark)
+
+        addNether(Entities.netherZombie, 200, 4, 12)
+        SpawnRestriction.register(Entities.netherZombie, SpawnRestriction.Location.ON_GROUND, Heightmap.Type.MOTION_BLOCKING_NO_LEAVES, HostileEntity::canSpawnIgnoreLightLevel)
+
+        addNether(Entities.netherArcher, 40, 1, 4)
+        SpawnRestriction.register(Entities.netherArcher, SpawnRestriction.Location.ON_GROUND, Heightmap.Type.MOTION_BLOCKING_NO_LEAVES, HostileEntity::canSpawnIgnoreLightLevel)
+
+        addNether(Entities.netherBloody, 30, 1, 4)
+        SpawnRestriction.register(Entities.netherBloody, SpawnRestriction.Location.ON_GROUND, Heightmap.Type.MOTION_BLOCKING_NO_LEAVES, HostileEntity::canSpawnIgnoreLightLevel)
+
+        addNether(Entities.netherOvergrown, 25, 1, 4)
+        SpawnRestriction.register(Entities.netherOvergrown, SpawnRestriction.Location.ON_GROUND, Heightmap.Type.MOTION_BLOCKING_NO_LEAVES, HostileEntity::canSpawnIgnoreLightLevel)
+
+        addNether(Entities.netherBomber, 20, 1, 1)
+        SpawnRestriction.register(Entities.netherBomber, SpawnRestriction.Location.ON_GROUND, Heightmap.Type.MOTION_BLOCKING_NO_LEAVES, HostileEntity::canSpawnIgnoreLightLevel)
     }
 
     fun removeVanillaZombieSpawns() {
@@ -54,6 +69,9 @@ object EntitySpawns {
 
     private fun <T : Entity> addOverworld(entityType: EntityType<T>, weight: Int, minGroupSize: Int, maxGroupSize: Int) =
         BiomeModifications.addSpawn(BiomeSelectors.foundInOverworld(), SpawnGroup.MONSTER, entityType, weight, minGroupSize, maxGroupSize)
+
+    private fun <T : Entity> addNether(entityType: EntityType<T>, weight: Int, minGroupSize: Int, maxGroupSize: Int) =
+        BiomeModifications.addSpawn(BiomeSelectors.foundInTheNether(), SpawnGroup.MONSTER, entityType, weight, minGroupSize, maxGroupSize)
 
     private fun <T : Entity> removeSpawn(entityType: EntityType<T>) =
         biomeModificationInstance.addModifier(EntityType.getId(entityType), ModificationPhase.REMOVALS, { true }) {
