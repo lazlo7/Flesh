@@ -30,6 +30,9 @@ object EntitySpawns {
 
         addOverworld(Entities.overgrown, 25, 1, 4)
         SpawnRestriction.register(Entities.overgrown, SpawnRestriction.Location.ON_GROUND, Heightmap.Type.MOTION_BLOCKING_NO_LEAVES, HostileEntity::canSpawnInDark)
+
+        addOverworld(Entities.bomber, 20, 1, 1)
+        SpawnRestriction.register(Entities.bomber, SpawnRestriction.Location.ON_GROUND, Heightmap.Type.MOTION_BLOCKING_NO_LEAVES, HostileEntity::canSpawnInDark)
     }
 
     fun removeVanillaZombieSpawns() {
