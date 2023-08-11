@@ -23,10 +23,10 @@ object Renderers {
         register(Entities.bloody) { ctx -> ZombieRenderer(ctx, BloodyModel()) }
         register(Entities.bomber) { ctx -> BomberRenderer(ctx) }
 
-        register(Entities.netherZombie, ::ZombieRenderer)
-        register(Entities.netherOvergrown) { ctx -> ZombieRenderer(ctx, OvergrownModel()) }
-        register(Entities.netherArcher) { ctx -> ZombieRenderer(ctx, ArcherModel()) }
-        register(Entities.netherBloody) { ctx -> ZombieRenderer(ctx, BloodyModel()) }
-        register(Entities.netherBomber) { ctx -> BomberRenderer(ctx) }
+        register(Entities.netherZombie) { ctx -> ZombieRenderer(ctx, netherEyes = true) }
+        register(Entities.netherOvergrown) { ctx -> ZombieRenderer(ctx, OvergrownModel(), true) }
+        register(Entities.netherArcher) { ctx -> ZombieRenderer(ctx, ArcherModel(), true) }
+        register(Entities.netherBloody) { ctx -> ZombieRenderer(ctx, BloodyModel(), true) }
+        register(Entities.netherBomber) { ctx -> BomberRenderer(ctx, netherEyes = true) }
     }
 }

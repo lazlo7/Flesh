@@ -7,8 +7,11 @@ import software.bernie.geckolib.cache.`object`.GeoBone
 import software.bernie.geckolib.model.GeoModel
 import software.bernie.geckolib.renderer.layer.BlockAndItemGeoLayer
 
-class BomberRenderer(ctx: EntityRendererFactory.Context, model: GeoModel<Bomber> = BomberModel())
-    : ZombieRenderer<Bomber>(ctx, model) {
+class BomberRenderer(
+    ctx: EntityRendererFactory.Context,
+    model: GeoModel<Bomber> = BomberModel(),
+    netherEyes: Boolean = false
+) : ZombieRenderer<Bomber>(ctx, model, netherEyes) {
     init {
         renderLayers.addLayer(object : BlockAndItemGeoLayer<Bomber>(this) {
             override fun getBlockForBone(bone: GeoBone, animatable: Bomber) = when (bone.name) {

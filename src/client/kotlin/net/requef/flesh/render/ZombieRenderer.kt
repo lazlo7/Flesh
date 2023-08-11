@@ -9,6 +9,7 @@ import net.minecraft.entity.EquipmentSlot
 import net.minecraft.entity.mob.MobEntity
 import net.minecraft.item.ItemStack
 import net.minecraft.util.math.RotationAxis
+import net.requef.flesh.Flesh
 import net.requef.flesh.model.ZombieModel
 import software.bernie.geckolib.cache.`object`.GeoBone
 import software.bernie.geckolib.core.animatable.GeoAnimatable
@@ -17,8 +18,16 @@ import software.bernie.geckolib.renderer.GeoEntityRenderer
 import software.bernie.geckolib.renderer.layer.BlockAndItemGeoLayer
 import software.bernie.geckolib.renderer.layer.ItemArmorGeoLayer
 
-open class ZombieRenderer<T>(ctx: EntityRendererFactory.Context, model: GeoModel<T> = ZombieModel())
-    : GeoEntityRenderer<T>(ctx, model) where T: MobEntity, T: GeoAnimatable {
+open class ZombieRenderer<T>(
+    ctx: EntityRendererFactory.Context,
+    model: GeoModel<T> = ZombieModel(),
+    netherEyes: Boolean = false
+) : GeoEntityRenderer<T>(ctx, model) where T: MobEntity, T: GeoAnimatable {
+    companion object {
+        private val normalEyesTextureResource = Flesh.identifier("textures/entity/zombie_eyes.png")
+        private val netherEyesTextureResource = Flesh.identifier("textures/entity/nether_zombie_eyes.png")
+    }
+
     val armorRightBootName = "right_leg_boots"
     val armorLeftBootName = "left_leg_boots"
 
@@ -114,5 +123,8 @@ open class ZombieRenderer<T>(ctx: EntityRendererFactory.Context, model: GeoModel
                 )
             }
         })
+
+        val eyesResource = if (netherEyes) netherEyesTextureResource else normalEyesTextureResource
+        renderLayers.addLayer(EyesGeoRenderLayer(eyesResource, this))
     }
 }
