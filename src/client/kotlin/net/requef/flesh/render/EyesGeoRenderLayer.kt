@@ -12,9 +12,12 @@ import software.bernie.geckolib.core.animatable.GeoAnimatable
 import software.bernie.geckolib.renderer.GeoRenderer
 import software.bernie.geckolib.renderer.layer.GeoRenderLayer
 
+private const val maxPackedLight = 0xf00000
+
 class EyesGeoRenderLayer<T>(
     private val eyesTextureResource: Identifier,
-    renderer: GeoRenderer<T>
+    renderer: GeoRenderer<T>,
+    private val eyesGlowing: Boolean = false
 ) : GeoRenderLayer<T>(renderer) where T: GeoAnimatable, T: Entity {
     override fun render(
         poseStack: MatrixStack,
@@ -36,7 +39,7 @@ class EyesGeoRenderLayer<T>(
             armorRenderType,
             bufferSource.getBuffer(armorRenderType),
             partialTick,
-            packedLight,
+            if (eyesGlowing) maxPackedLight else packedLight,
             OverlayTexture.DEFAULT_UV,
             1f,
             1f,

@@ -124,7 +124,10 @@ open class ZombieRenderer<T>(
             }
         })
 
-        val eyesResource = if (netherEyes) netherEyesTextureResource else normalEyesTextureResource
-        renderLayers.addLayer(EyesGeoRenderLayer(eyesResource, this))
+        if (netherEyes) {
+            renderLayers.addLayer(EyesGeoRenderLayer(netherEyesTextureResource, this, true))
+        } else {
+            renderLayers.addLayer(EyesGeoRenderLayer(normalEyesTextureResource, this))
+        }
     }
 }
